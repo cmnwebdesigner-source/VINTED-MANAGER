@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b63f6" />
-  <title>Vinted Manager</title>
+  <meta name="theme-color" content="#121016" />
+  <title>Vinted Manager · Hollywood Edition</title>
+  <!-- VERSIUNE 3.0 HOLLYWOOD: interfață cinematică, navigare mobilă și flux simplificat -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -43,6 +44,8 @@
     }
 
     button, input, select, textarea { font: inherit; }
+    button, [role="button"] { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+    .page { contain: layout style; }
     button { cursor: pointer; }
     img { display: block; max-width: 100%; }
     .hidden { display: none !important; }
@@ -322,6 +325,81 @@
     .hero-side-card span { display: block; font-size: 11px; opacity: .78; }
     .hero-side-card strong { display: block; font-size: 20px; margin-top: 3px; }
 
+
+    .clickable-card {
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, filter .16s ease;
+    }
+    .clickable-card:hover { transform: translateY(-2px); filter: brightness(1.015); }
+    .clickable-card:active { transform: scale(.985); }
+    .metric-card.clickable-card:hover, .panel.clickable-card:hover { box-shadow: 0 15px 35px rgba(31,83,167,.16); border-color: #cbdcff; }
+    .hero-click-area { position: relative; z-index: 2; border-radius: 18px; padding: 5px; margin: -5px; }
+    .hero-click-area:focus-visible, .clickable-card:focus-visible, .mini-product:focus-visible { outline: 3px solid rgba(255,255,255,.72); outline-offset: 3px; }
+    .metric-card:focus-visible, .mini-product:focus-visible { outline-color: rgba(11,99,246,.38); }
+    .card-arrow { margin-left: auto; color: #9aabc8; transition: transform .16s ease; }
+    .clickable-card:hover .card-arrow, .mini-product:hover .card-arrow { transform: translateX(3px); color: var(--blue); }
+    .mini-product { cursor: pointer; transition: transform .15s ease, background .15s ease, border-color .15s ease; }
+    .mini-product:hover { transform: translateX(3px); background: #fff; border-color: #cfddf5; }
+    .mini-product:active { transform: scale(.99); }
+    .product-card.focused-item {
+      animation: focusPulse 1.7s ease;
+      border-color: rgba(11,99,246,.75);
+      box-shadow: 0 0 0 5px rgba(11,99,246,.12), 0 18px 45px rgba(31,83,167,.2);
+    }
+    @keyframes focusPulse {
+      0%,100% { transform: translateY(0); }
+      35% { transform: translateY(-5px); }
+    }
+    .monthly-overview {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 15px;
+      margin-bottom: 17px;
+    }
+    .month-main-card, .month-side-card {
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--line);
+      border-radius: 21px;
+      box-shadow: var(--shadow-sm);
+      padding: 19px;
+    }
+    .month-main-card { background: linear-gradient(135deg, #ffffff, #f3f8ff); }
+    .month-label { color: var(--muted); font-size: 11px; font-weight: 750; text-transform: uppercase; letter-spacing: .45px; }
+    .month-profit { font-size: 34px; font-weight: 900; letter-spacing: -1px; color: var(--success); margin: 7px 0 13px; }
+    .month-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; }
+    .month-mini { padding: 11px; border-radius: 13px; background: #f7faff; }
+    .month-mini span { display:block; color:var(--muted); font-size:9px; }
+    .month-mini strong { display:block; margin-top:4px; font-size:13px; }
+    .breakdown-list { display: grid; gap: 9px; }
+    .breakdown-row {
+      display: grid;
+      grid-template-columns: 48px minmax(0,1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      background: #f9fbff;
+      border-radius: 14px;
+      cursor: pointer;
+    }
+    .breakdown-row:hover { background: #fff; border-color: #cadbf7; }
+    .breakdown-row .thumb { width: 48px; height: 48px; }
+    .breakdown-row strong { display:block; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .breakdown-row span { display:block; color:var(--muted); font-size:9px; margin-top:3px; }
+    .breakdown-price { font-size:13px !important; color:var(--text) !important; font-weight:850; margin:0 !important; white-space:nowrap; }
+    .modal-total { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:15px; padding:14px; border-radius:14px; background:var(--blue-soft); color:var(--blue); }
+    .weekly-products { margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--line); display:grid; gap:7px; }
+    .weekly-product-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 10px; border-radius:11px; background:#f8fbff; cursor:pointer; }
+    .weekly-product-row:hover { background:var(--blue-soft); }
+    .weekly-product-row div { min-width:0; }
+    .weekly-product-row strong { display:block; font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .weekly-product-row span { display:block; color:var(--muted); font-size:9px; margin-top:2px; }
+    .weekly-product-row em { flex:0 0 auto; font-size:9px; font-style:normal; font-weight:800; color:var(--blue); background:var(--blue-soft); padding:5px 7px; border-radius:8px; }
+    .swipe-hint { display:none; }
+
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -534,6 +612,8 @@
       .topbar { align-items: flex-start; }
       .top-actions { flex-direction: row-reverse; }
       .dashboard-grid, .settings-grid { grid-template-columns: 1fr; }
+      .monthly-overview { grid-template-columns: 1fr; }
+      .swipe-hint { display:block; position:fixed; left:0; top:35%; width:3px; height:84px; border-radius:0 5px 5px 0; background:rgba(11,99,246,.2); pointer-events:none; z-index:20; }
       .fab { right: 19px; bottom: 20px; }
     }
 
@@ -561,6 +641,7 @@
       .price-grid { gap: 5px; }
       .price-box { padding: 8px 6px; }
       .weekly-stats { grid-template-columns: repeat(2, 1fr); }
+      .month-grid { grid-template-columns: 1fr 1fr; }
       .form-grid { grid-template-columns: 1fr; }
       .form-grid .full-span { grid-column: auto; }
       .modal { padding: 19px 15px; border-radius: 21px; }
@@ -570,6 +651,489 @@
       .search-box { max-width: none; }
       .fab { width: 58px; height: 58px; border-radius: 18px; }
     }
+
+
+    /* ============================================================
+       HOLLYWOOD EDITION 3.0 — REDESIGN COMPLET
+       ============================================================ */
+    :root {
+      --blue: #cfa84f;
+      --blue-2: #f1d17f;
+      --blue-soft: #fbf2dc;
+      --blue-pale: #f7f3ea;
+      --navy: #121016;
+      --text: #1b1820;
+      --muted: #77717d;
+      --line: rgba(28, 23, 32, .11);
+      --white: #ffffff;
+      --success: #15865f;
+      --success-soft: #e9f7f1;
+      --danger: #c94e5d;
+      --danger-soft: #fff0f2;
+      --warning: #b77a1d;
+      --warning-soft: #fff5de;
+      --gold: #cfa84f;
+      --gold-light: #f4d88f;
+      --ink: #121016;
+      --ink-soft: #201c26;
+      --cream: #f5f0e7;
+      --shadow: 0 24px 70px rgba(27, 20, 31, .12);
+      --shadow-sm: 0 12px 35px rgba(27, 20, 31, .08);
+      --radius: 26px;
+      --radius-sm: 16px;
+    }
+
+    html { background: var(--cream); }
+    body {
+      background:
+        radial-gradient(circle at 5% 0%, rgba(207,168,79,.16), transparent 26%),
+        radial-gradient(circle at 95% 8%, rgba(99,64,104,.10), transparent 24%),
+        linear-gradient(145deg, #fbf8f2 0%, #f3eee5 52%, #f8f4ed 100%);
+      color: var(--text);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .14;
+      background-image: radial-gradient(rgba(18,16,22,.2) .55px, transparent .55px);
+      background-size: 7px 7px;
+      z-index: -1;
+    }
+
+    .login-shell {
+      background:
+        radial-gradient(circle at 50% 10%, rgba(241,209,127,.20), transparent 25%),
+        linear-gradient(145deg, #0b0a0d 0%, #17131b 56%, #0c0a0e 100%);
+    }
+    .login-card {
+      background: rgba(250,247,240,.97);
+      border: 1px solid rgba(244,216,143,.26);
+      box-shadow: 0 35px 100px rgba(0,0,0,.45);
+      border-radius: 32px;
+      padding: 34px;
+    }
+    .login-card::before {
+      height: 5px;
+      background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+    }
+    .brand-mark {
+      color: #17131b;
+      background: linear-gradient(145deg, #f6de9f, #c99e42);
+      box-shadow: 0 15px 34px rgba(176,126,32,.24);
+      border-radius: 17px;
+    }
+    .login-card h1,
+    .side-brand strong,
+    .topbar h1,
+    .cinema-copy h2 {
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+    }
+    .login-card h1 { font-size: 31px; color: var(--ink); }
+    .login-subtitle { color: #716a75; }
+    .login-note { background: #f2eadb; border-color: rgba(207,168,79,.35); color: #63552f; }
+
+    input, select, textarea {
+      background: #fffdfa;
+      border-color: rgba(28,23,32,.13);
+      min-height: 50px;
+      border-radius: 14px;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(207,168,79,.15);
+    }
+
+    .primary-btn {
+      color: #17120a;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      box-shadow: 0 12px 28px rgba(166,118,29,.22);
+    }
+    .secondary-btn { color: #6d5220; background: #f9efd9; }
+    .ghost-btn { color: #4d4751; border-color: rgba(28,23,32,.14); background: #fffdfa; }
+    .mini-btn { color: #6f531c; background: #f9efd9; }
+    .mini-btn.success { color: #fff; background: #168961; }
+    .mini-btn.top { color: #392b0e; background: linear-gradient(135deg,#f8dfa0,#d5a94c); }
+
+    .sidebar {
+      width: 292px;
+      padding: 25px 20px 20px;
+      color: #f8f0df;
+      background:
+        radial-gradient(circle at 25% 0%, rgba(239,203,112,.14), transparent 30%),
+        linear-gradient(180deg, #151219 0%, #0d0c10 100%);
+      border-right: 1px solid rgba(241,209,127,.14);
+      box-shadow: 20px 0 70px rgba(18,16,22,.08);
+    }
+    .side-brand { padding: 7px 6px 25px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 20px; }
+    .side-brand .brand-mark { box-shadow: none; }
+    .side-brand strong { color: #fff7e9; font-size: 18px; letter-spacing: -.2px; }
+    .side-brand span { color: rgba(255,255,255,.45); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-list { gap: 8px; }
+    .nav-item {
+      color: rgba(255,255,255,.62);
+      border-radius: 15px;
+      min-height: 52px;
+      font-weight: 760;
+      border: 1px solid transparent;
+    }
+    .nav-item:hover { color: white; background: rgba(255,255,255,.06); }
+    .nav-item.active {
+      color: #1b150a;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      box-shadow: 0 12px 30px rgba(176,126,32,.20);
+      border-color: rgba(255,255,255,.12);
+    }
+    .side-user {
+      background: rgba(255,255,255,.055);
+      border-color: rgba(255,255,255,.08);
+      color: white;
+    }
+    .side-user span { color: rgba(255,255,255,.42); }
+    .avatar { color: #21170a; background: linear-gradient(145deg, #f6df9f, #c89d42); }
+
+    .main {
+      margin-left: 292px;
+      width: calc(100% - 292px);
+      padding: 30px clamp(22px, 4vw, 58px) 110px;
+      max-width: 1780px;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 24;
+      margin: -10px -12px 27px;
+      padding: 14px 12px 17px;
+      background: rgba(247,243,235,.82);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(28,23,32,.06);
+    }
+    .topbar h1 { color: var(--ink); font-size: clamp(27px,3vw,38px); }
+    .topbar p { color: var(--muted); font-size: 12px; }
+    .sync-pill {
+      background: rgba(255,255,255,.78);
+      color: #4d4751;
+      border-color: rgba(28,23,32,.10);
+      box-shadow: 0 8px 24px rgba(27,20,31,.06);
+    }
+
+    .cinema-hero {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0,1.35fr) minmax(290px,.65fr);
+      gap: 28px;
+      padding: clamp(25px,4vw,48px);
+      border-radius: 34px;
+      color: white;
+      background:
+        radial-gradient(circle at 88% 15%, rgba(245,216,143,.25), transparent 22%),
+        radial-gradient(circle at 12% 100%, rgba(117,67,102,.23), transparent 34%),
+        linear-gradient(145deg, #16131a 0%, #25202b 55%, #0e0c11 100%);
+      box-shadow: 0 32px 75px rgba(18,16,22,.24);
+      border: 1px solid rgba(244,216,143,.16);
+    }
+    .cinema-hero::after {
+      content: '';
+      position: absolute;
+      right: -110px;
+      bottom: -130px;
+      width: 330px;
+      height: 330px;
+      border-radius: 50%;
+      border: 1px solid rgba(244,216,143,.17);
+      box-shadow: 0 0 0 40px rgba(244,216,143,.035), 0 0 0 80px rgba(244,216,143,.025);
+    }
+    .cinema-copy, .cinema-summary { position: relative; z-index: 2; }
+    .cinema-kicker, .section-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold-light);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+    .cinema-kicker::before, .section-kicker::before { content:''; width: 24px; height: 1px; background: currentColor; }
+    .cinema-copy h2 { margin: 15px 0 8px; font-size: clamp(30px,4.6vw,54px); line-height: .98; letter-spacing: -1.7px; max-width: 720px; }
+    .cinema-copy > p { margin: 0 0 25px; max-width: 590px; color: rgba(255,255,255,.60); font-size: 13px; line-height: 1.65; }
+    .hero-profit-card {
+      width: min(520px,100%);
+      display: grid;
+      text-align: left;
+      padding: 18px 20px;
+      border: 1px solid rgba(244,216,143,.20);
+      border-radius: 20px;
+      color: white;
+      background: rgba(255,255,255,.075);
+      backdrop-filter: blur(12px);
+      transition: .18s ease;
+    }
+    .hero-profit-card:hover { transform: translateY(-2px); background: rgba(255,255,255,.10); }
+    .hero-profit-card small { color: rgba(255,255,255,.55); font-weight: 750; }
+    .hero-profit-card strong { margin: 3px 0; font-size: clamp(35px,5vw,54px); letter-spacing: -2px; color: #f5d98f; }
+    .hero-profit-card span { color: rgba(255,255,255,.50); font-size: 10px; }
+    .hero-buttons { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+    .hero-buttons .primary-btn { min-height: 48px; }
+    .ghost-light {
+      min-height: 48px;
+      padding: 0 17px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      color: white;
+      background: rgba(255,255,255,.055);
+      font-weight: 800;
+    }
+    .cinema-summary {
+      display: grid;
+      align-content: center;
+      gap: 11px;
+    }
+    .spotlight-card {
+      padding: 16px 17px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.075);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: .16s ease;
+    }
+    .spotlight-card:hover { transform: translateX(-3px); background: rgba(255,255,255,.105); }
+    .spotlight-card span { display:block; color:rgba(255,255,255,.50); font-size:10px; }
+    .spotlight-card strong { display:block; margin-top:5px; font-size:19px; }
+    .spotlight-card em { display:block; margin-top:3px; color:var(--gold-light); font-size:9px; font-style:normal; font-weight:800; }
+
+    .simple-flow {
+      margin: 18px 0;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 10px;
+      background: rgba(255,255,255,.68);
+      border: 1px solid rgba(28,23,32,.08);
+      border-radius: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+    .flow-step { display:flex; align-items:center; gap:11px; padding:10px; min-width:0; }
+    .flow-number {
+      width:36px; height:36px; border-radius:13px; display:grid; place-items:center; flex:0 0 auto;
+      color:#1d160a; background:linear-gradient(145deg,#f5d98f,#cda54d); font-weight:950;
+    }
+    .flow-step strong { display:block; font-size:12px; }
+    .flow-step span { display:block; margin-top:2px; color:var(--muted); font-size:9px; line-height:1.35; }
+
+    .quick-grid {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+      margin: 18px 0;
+    }
+    .quick-card {
+      position:relative;
+      overflow:hidden;
+      min-height:148px;
+      padding:19px;
+      border-radius:22px;
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(28,23,32,.08);
+      box-shadow:var(--shadow-sm);
+      cursor:pointer;
+      transition:transform .18s ease,box-shadow .18s ease;
+    }
+    .quick-card:hover { transform:translateY(-4px); box-shadow:0 20px 50px rgba(27,20,31,.13); }
+    .quick-card.dark { color:white; background:linear-gradient(145deg,#1b1720,#0f0d12); }
+    .quick-card.gold { color:#211808; background:linear-gradient(145deg,#f5dfa4,#cfaa55); }
+    .quick-card.plum { color:white; background:linear-gradient(145deg,#5b354e,#2e1d2a); }
+    .quick-icon { width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:rgba(207,168,79,.15);color:#9d7422; }
+    .quick-card.dark .quick-icon,.quick-card.plum .quick-icon { color:var(--gold-light);background:rgba(255,255,255,.09); }
+    .quick-card.gold .quick-icon { background:rgba(40,27,7,.10);color:#3a280b; }
+    .quick-value { display:block;margin-top:17px;font-size:25px;font-weight:950;letter-spacing:-.7px; }
+    .quick-title { display:block;margin-top:3px;font-size:12px;font-weight:850; }
+    .quick-description { display:block;margin-top:4px;color:var(--muted);font-size:9px;line-height:1.45; }
+    .quick-card.dark .quick-description,.quick-card.plum .quick-description { color:rgba(255,255,255,.47); }
+    .quick-card.gold .quick-description { color:rgba(35,24,6,.60); }
+
+    .dashboard-grid { grid-template-columns: 1.15fr .85fr; gap: 18px; }
+    .panel, .metric-card, .product-card, .weekly-card, .setting-card, .month-main-card, .month-side-card {
+      background: rgba(255,255,255,.88);
+      border-color: rgba(28,23,32,.08);
+      box-shadow: var(--shadow-sm);
+    }
+    .panel { border-radius: 25px; padding: 22px; }
+    .panel-head h2 { font-size:18px; }
+    .panel-head p { font-size:10px; }
+    .mini-product {
+      background:#fbf8f2;
+      border-color:rgba(28,23,32,.07);
+      border-radius:16px;
+      padding:10px;
+    }
+    .mini-product:hover { background:#fff; border-color:rgba(207,168,79,.5); }
+    .thumb { border-radius:14px; background:#f0e7d7; }
+    .thumb-placeholder { color:#9d7422; }
+    .week-row { border-color:rgba(28,23,32,.08); }
+
+    .section-intro {
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:18px;
+      padding:24px;
+      margin-bottom:15px;
+      border-radius:25px;
+      color:white;
+      background:linear-gradient(145deg,#1b1720,#0f0d12);
+      border:1px solid rgba(244,216,143,.13);
+      box-shadow:0 20px 50px rgba(18,16,22,.18);
+    }
+    .section-intro h2 { margin:9px 0 4px;font-family:ui-serif,Georgia,serif;font-size:27px;letter-spacing:-.7px; }
+    .section-intro p { margin:0;color:rgba(255,255,255,.52);font-size:11px;line-height:1.55; }
+    .count-bubble { min-width:68px;height:68px;border-radius:21px;display:grid;place-items:center;color:#211708;background:linear-gradient(145deg,#f5da93,#cda34a);font-size:24px;font-weight:950; }
+    .section-tools { padding: 0 2px; }
+    .search-box input { background:rgba(255,255,255,.82); }
+
+    .product-card { border-radius:24px; }
+    .product-image, .product-image-placeholder { background:linear-gradient(145deg,#ede3d2,#faf6ee); }
+    .product-image-placeholder { color:#9d7422; }
+    .product-body { padding:17px; }
+    .product-title { font-size:16px; }
+    .badge { color:#735718;background:#f8ecd1;border-radius:99px; }
+    .badge.sold { color:#116947;background:#e6f4ee; }
+    .badge.top { color:#261b08;background:linear-gradient(135deg,#f7dda0,#d1a74c); }
+    .price-box { background:#f8f5ef;border:1px solid rgba(28,23,32,.055); }
+    .price-box.profit { background:#eaf6f1; }
+    .top-card::before { background:linear-gradient(90deg,#d0a64b,#f4d78b,#d0a64b); }
+    .product-card.focused-item { border-color:var(--gold); box-shadow:0 0 0 5px rgba(207,168,79,.15),0 22px 55px rgba(27,20,31,.16); }
+
+    .stats-head-card {
+      background:linear-gradient(145deg,#1d1822,#0e0c11);
+      color:#fff8e8;
+      border:1px solid rgba(244,216,143,.13);
+      box-shadow:0 22px 55px rgba(18,16,22,.20);
+    }
+    .month-main-card { background:linear-gradient(145deg,#fffdf8,#f3ead9); }
+    .month-profit { color:#136f50; }
+    .weekly-stat,.month-mini,.weekly-product-row { background:#f8f5ef; }
+    .profit-bar { background:#eee7dc; }
+    .profit-bar span { background:linear-gradient(90deg,#b7862f,#f0cf78); }
+    .weekly-product-row em { color:#6d511b;background:#f7ecd3; }
+    .modal-total { color:#644b1a;background:#f9efd8; }
+
+    .settings-grid { gap:18px; }
+    .setting-card { border-radius:24px; }
+
+    .fab {
+      right: 30px;
+      bottom: 29px;
+      width:auto;
+      height:58px;
+      padding:0 21px;
+      gap:10px;
+      border-radius:18px;
+      color:#1f1608;
+      background:linear-gradient(145deg,#f4d98f,#cba149);
+      box-shadow:0 18px 42px rgba(151,103,20,.30);
+      font-weight:900;
+    }
+    .fab span { display:block; }
+
+    .modal-backdrop { background:rgba(10,8,12,.68); }
+    .modal { background:#fbf8f2;border:1px solid rgba(244,216,143,.22);border-radius:29px;box-shadow:0 35px 100px rgba(0,0,0,.42); }
+    .close-btn { color:#5e5661;background:#eee8df; }
+    .image-picker { color:#7a632e;background:#f7f0e3;border-color:#cdb77f;border-radius:19px; }
+    .toast { background:#17131b;border:1px solid rgba(244,216,143,.18); }
+
+    .mobile-nav { display:none; }
+
+    @media (max-width: 1180px) {
+      .quick-grid { grid-template-columns:repeat(2,1fr); }
+      .cinema-hero { grid-template-columns:1fr .75fr; }
+    }
+
+    @media (max-width: 850px) {
+      .sidebar { width:min(316px,86vw); }
+      .main { width:100%;margin-left:0;padding:20px 16px 126px; }
+      .topbar { margin:-5px -5px 20px;padding:10px 5px 14px; }
+      .menu-btn { color:#22180a;background:linear-gradient(145deg,#f6dda0,#d0a54d);border:0;box-shadow:0 8px 22px rgba(166,118,29,.17); }
+      .cinema-hero { grid-template-columns:1fr; border-radius:28px;padding:27px 22px; }
+      .cinema-copy h2 { font-size:36px; }
+      .cinema-summary { grid-template-columns:repeat(3,1fr); }
+      .spotlight-card { padding:13px; }
+      .spotlight-card strong { font-size:15px; }
+      .spotlight-card em { display:none; }
+      .simple-flow { grid-template-columns:1fr;gap:2px; }
+      .flow-step { border-bottom:1px solid rgba(28,23,32,.07); }
+      .flow-step:last-child { border-bottom:0; }
+      .dashboard-grid { grid-template-columns:1fr; }
+      .fab { right:50%;bottom:28px;transform:translateX(50%);width:62px;height:62px;padding:0;border-radius:21px;z-index:61; }
+      .fab:active { transform:translateX(50%) scale(.96); }
+      .fab span { display:none; }
+      .mobile-nav {
+        position:fixed;
+        left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));
+        z-index:55;
+        display:grid;
+        grid-template-columns:1fr 1fr 74px 1fr 1fr;
+        align-items:center;
+        min-height:74px;
+        padding:7px 8px;
+        background:rgba(20,17,24,.94);
+        border:1px solid rgba(244,216,143,.15);
+        border-radius:24px;
+        box-shadow:0 22px 60px rgba(0,0,0,.34);
+        backdrop-filter:blur(18px);
+      }
+      .mobile-nav .nav-item {
+        min-height:57px;
+        padding:5px 2px;
+        gap:3px;
+        flex-direction:column;
+        justify-content:center;
+        color:rgba(255,255,255,.50);
+        background:transparent;
+        box-shadow:none;
+        border:0;
+        border-radius:16px;
+        font-size:9px;
+      }
+      .mobile-nav .nav-item .icon { width:20px;height:20px; }
+      .mobile-nav .nav-item.active { color:var(--gold-light);background:rgba(255,255,255,.065); }
+      .mobile-nav-gap { display:block; }
+      .swipe-hint { background:rgba(207,168,79,.32); }
+    }
+
+    @media (max-width: 600px) {
+      .login-card { padding:28px 20px; }
+      .topbar h1 { font-size:28px; }
+      .topbar p { max-width:240px; }
+      .cinema-copy h2 { font-size:32px; }
+      .cinema-copy > p { font-size:11px; }
+      .hero-profit-card strong { font-size:39px; }
+      .hero-buttons { display:grid;grid-template-columns:1fr 1fr; }
+      .hero-buttons button { width:100%;padding:0 10px;font-size:11px; }
+      .cinema-summary { grid-template-columns:1fr;gap:8px; }
+      .spotlight-card { display:flex;align-items:center;justify-content:space-between;gap:10px; }
+      .spotlight-card span { font-size:9px; }
+      .spotlight-card strong { margin:0;font-size:14px; }
+      .quick-grid { grid-template-columns:repeat(2,1fr);gap:10px; }
+      .quick-card { min-height:142px;padding:15px;border-radius:19px; }
+      .quick-value { font-size:21px; }
+      .section-intro { align-items:center;padding:19px;border-radius:22px; }
+      .section-intro h2 { font-size:22px; }
+      .count-bubble { min-width:56px;height:56px;border-radius:18px;font-size:20px; }
+      .panel { padding:17px; }
+      .product-card { grid-template-columns:105px minmax(0,1fr); }
+      .product-image,.product-image-placeholder { width:105px;min-height:184px; }
+      .product-body { padding:13px; }
+      .product-title { font-size:14px; }
+      .price-box span { font-size:7px; }
+      .price-box strong { font-size:11px; }
+      .fab { bottom:27px; }
+    }
+
   </style>
 </head>
 <body>
@@ -579,7 +1143,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5z"/><path d="m4 8.5 8 4.5 8-4.5M12 13v7"/></svg>
       </div>
       <h1>Vinted Manager</h1>
-      <p class="login-subtitle">Produse, vânzări și profit, toate într-un singur loc.</p>
+      <p class="login-subtitle">Tot ce vinzi, explicat simplu și arătat spectaculos.</p>
 
       <form id="loginForm">
         <div class="field">
@@ -613,7 +1177,7 @@
         <div class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5z"/><path d="m4 8.5 8 4.5 8-4.5M12 13v7"/></svg>
         </div>
-        <div><strong>Vinted Manager</strong><span>Panoul tău de vânzări</span></div>
+        <div><strong>Vinted Manager</strong><span>Hollywood Edition</span></div>
       </div>
 
       <nav class="nav-list" aria-label="Meniu principal">
@@ -631,7 +1195,7 @@
         </button>
         <button class="nav-item" data-page="top">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6-5.4-2.9-5.4 2.9 1-6-4.4-4.3 6.1-.9z"/></svg>
-          Cele mai vândute
+          Produse TOP
         </button>
         <button class="nav-item" data-page="statistics">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
@@ -659,7 +1223,7 @@
           </button>
           <div style="min-width:0;">
             <h1 id="pageTitle">Acasă</h1>
-            <p id="pageSubtitle">Situația vânzărilor tale, actualizată automat.</p>
+            <p id="pageSubtitle">Tot ce trebuie să știi despre produsele și banii tăi.</p>
           </div>
         </div>
         <div class="top-actions">
@@ -675,8 +1239,26 @@
       <section id="page-settings" class="page"></section>
     </main>
 
-    <button id="addFab" class="fab" aria-label="Adaugă un anunț">
+    <nav class="mobile-nav" aria-label="Navigare rapidă">
+      <button class="nav-item mobile-nav-item active" data-page="home" aria-label="Acasă">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></svg><span>Acasă</span>
+      </button>
+      <button class="nav-item mobile-nav-item" data-page="published" aria-label="Publicate">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l3 4v14H3V7z"/><path d="M3 7h18M9 11h6"/></svg><span>Publicate</span>
+      </button>
+      <span class="mobile-nav-gap" aria-hidden="true"></span>
+      <button class="nav-item mobile-nav-item" data-page="sold" aria-label="Vândute">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V5H4v14h8"/><path d="m15 18 2 2 4-5M8 9h8M8 13h4"/></svg><span>Vândute</span>
+      </button>
+      <button class="nav-item mobile-nav-item" data-page="statistics" aria-label="Statistici">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Statistici</span>
+      </button>
+    </nav>
+
+    <div class="swipe-hint" aria-hidden="true"></div>
+    <button id="addFab" class="fab" aria-label="Adaugă un produs">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Adaugă produs</span>
     </button>
   </div>
 
@@ -689,10 +1271,11 @@
        Înlocuiește valorile de mai jos cu Project URL și anon key.
        Dacă rămân necompletate, aplicația funcționează în modul demo/local.
        =============================================================== */
-    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = 'https://aiyhaviftcfrbiflukwi.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_fJfcojko5joGshn6MJBVvA_fD6pLNJC';
     const FIXED_EMAIL = 'ionut7628c@gmail.com';
     const DEMO_PIN_HASH = 'b968e8bbbac5318680e60cee33b2cad83d75ea30b4005ac8903c7d3c66895146';
+    const supabasePasswordFromPin = pin => `VintedManager-${pin}-Secure`;
 
     const ICON_PRODUCT = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l3 4v14H3V7z"/><path d="M3 7h18M9 11h6"/></svg>`;
     const ICON_EMPTY = `<svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l3 4v14H3V7z"/><path d="M3 7h18M9 11h6"/></svg>`;
@@ -709,16 +1292,19 @@
       search: '',
       editingImage: '',
       demo: !CONFIGURED,
-      busy: false
+      busy: false,
+      focusItemId: null,
+      pageHistory: ['home'],
+      swipeStart: null
     };
 
     const pageInfo = {
-      home: ['Acasă', 'Situația vânzărilor tale, actualizată automat.'],
-      published: ['Publicate', 'Toate anunțurile active.'],
-      sold: ['Vândute', 'Produsele vândute și profitul obținut.'],
-      top: ['Cele mai vândute', 'Produsele marcate de tine ca fiind în top.'],
-      statistics: ['Statistici', 'Rezultate calculate automat pentru fiecare săptămână.'],
-      settings: ['Setări', 'Cont, sincronizare și administrarea datelor.']
+      home: ['Acasă', 'Tot ce trebuie să știi despre produsele și banii tăi.'],
+      published: ['Publicate', 'Produsele care sunt acum la vânzare.'],
+      sold: ['Vândute', 'Aici vezi cât ai încasat și cât ai câștigat.'],
+      top: ['Produse TOP', 'Produsele pe care vrei să le urmărești separat.'],
+      statistics: ['Statistici', 'Rezultatele tale, organizate pe săptămâni.'],
+      settings: ['Setări', 'Contul, sincronizarea și datele aplicației.']
     };
 
     const money = value => `${Number(value || 0).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} lei`;
@@ -851,6 +1437,30 @@
     function totalRevenue(items = getSold()) { return items.reduce((sum, item) => sum + Number(item.sold_price || 0), 0); }
     function totalInvestment(items = getSold()) { return items.reduce((sum, item) => sum + Number(item.purchase_price || 0), 0); }
 
+
+    function startOfMonth(dateInput = new Date()) {
+      const d = new Date(dateInput);
+      return new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0, 0);
+    }
+
+    function endOfMonth(dateInput = new Date()) {
+      const d = new Date(dateInput);
+      return new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59, 999);
+    }
+
+    function inRange(value, start, end) {
+      const time = new Date(value).getTime();
+      return time >= start.getTime() && time <= end.getTime();
+    }
+
+    function currentMonthData() {
+      const start = startOfMonth();
+      const end = endOfMonth();
+      const published = state.items.filter(item => inRange(item.created_at, start, end));
+      const sold = getSold().filter(item => inRange(item.sold_at || item.created_at, start, end));
+      return { start, end, published, sold };
+    }
+
     function startOfWeek(dateInput) {
       const d = new Date(dateInput);
       d.setHours(0,0,0,0);
@@ -869,23 +1479,34 @@
 
     function weeklyGroups() {
       const map = new Map();
-      getSold().forEach(item => {
-        const date = new Date(item.sold_at || item.created_at);
-        const start = startOfWeek(date);
+      const ensureGroup = dateValue => {
+        const start = startOfWeek(dateValue);
         const key = start.toISOString().slice(0,10);
-        if (!map.has(key)) map.set(key, { start, end: endOfWeek(start), items: [] });
-        map.get(key).items.push(item);
+        if (!map.has(key)) map.set(key, { start, end: endOfWeek(start), publishedItems: [], soldItems: [], activities: [] });
+        return map.get(key);
+      };
+
+      state.items.forEach(item => {
+        const publishedGroup = ensureGroup(item.created_at);
+        publishedGroup.publishedItems.push(item);
+        publishedGroup.activities.push({ type: 'published', date: item.created_at, item });
+
+        if (item.status === 'sold') {
+          const soldDate = item.sold_at || item.created_at;
+          const soldGroup = ensureGroup(soldDate);
+          soldGroup.soldItems.push(item);
+          soldGroup.activities.push({ type: 'sold', date: soldDate, item });
+        }
       });
 
-      const currentStart = startOfWeek(new Date());
-      const currentKey = currentStart.toISOString().slice(0,10);
-      if (!map.has(currentKey)) map.set(currentKey, { start: currentStart, end: endOfWeek(currentStart), items: [] });
-
-      return [...map.values()].sort((a,b) => b.start - a.start);
+      ensureGroup(new Date());
+      return [...map.values()]
+        .map(group => ({ ...group, activities: group.activities.sort((a,b) => new Date(b.date) - new Date(a.date)) }))
+        .sort((a,b) => b.start - a.start);
     }
 
     function imageMarkup(item, className = 'product-image') {
-      if (item.image_url) return `<img class="${className}" src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.title)}" />`;
+      if (item.image_url) return `<img class="${className}" src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.title)}" loading="lazy" decoding="async" />`;
       if (className === 'thumb') return `<div class="thumb thumb-placeholder">${ICON_PRODUCT}</div>`;
       return `<div class="product-image-placeholder">${ICON_EMPTY}</div>`;
     }
@@ -894,7 +1515,7 @@
       const isSold = item.status === 'sold';
       const p = profit(item);
       const badge = item.is_top ? '<span class="badge top">TOP</span>' : `<span class="badge ${isSold ? 'sold' : ''}">${isSold ? 'Vândut' : 'Publicat'}</span>`;
-      const cardClass = item.is_top ? 'product-card top-card' : 'product-card';
+      const cardClass = `${item.is_top ? 'product-card top-card' : 'product-card'}${state.focusItemId === item.id ? ' focused-item' : ''}`;
       const prices = isSold
         ? `<div class="price-grid">
             <div class="price-box"><span>Cumpărat</span><strong>${money(item.purchase_price)}</strong></div>
@@ -908,16 +1529,16 @@
 
       let actions = '';
       if (mode === 'published') {
-        actions = `<button class="mini-btn success" data-action="sell" data-id="${item.id}">Vândut</button>
+        actions = `<button class="mini-btn success" data-action="sell" data-id="${item.id}">Marchează vândut</button>
                    <button class="mini-btn remove" data-action="delete" data-id="${item.id}">Șterge</button>`;
       } else if (mode === 'sold') {
-        actions = `<button class="mini-btn ${item.is_top ? 'remove' : 'top'}" data-action="toggle-top" data-id="${item.id}">${item.is_top ? 'Scoate din TOP' : 'În TOP'}</button>
+        actions = `<button class="mini-btn ${item.is_top ? 'remove' : 'top'}" data-action="toggle-top" data-id="${item.id}">${item.is_top ? 'Scoate din TOP' : 'Adaugă în TOP'}</button>
                    <button class="mini-btn remove" data-action="delete" data-id="${item.id}">Șterge</button>`;
       } else if (mode === 'top') {
         actions = `<button class="mini-btn remove" data-action="toggle-top" data-id="${item.id}">Scoate din TOP</button>`;
       }
 
-      return `<article class="${cardClass}">
+      return `<article id="item-${item.id}" class="${cardClass}">
         ${imageMarkup(item)}
         <div class="product-body">
           <div class="product-title-row"><h3 class="product-title">${escapeHtml(item.title)}</h3>${badge}</div>
@@ -942,49 +1563,87 @@
       const sold = getSold();
       const groups = weeklyGroups();
       const current = groups.find(g => g.start.getTime() === startOfWeek(new Date()).getTime()) || groups[0];
-      const currentProfit = totalProfit(current.items);
-      const recent = [...state.items].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,4);
+      const currentProfit = totalProfit(current.soldItems);
+      const month = currentMonthData();
+      const monthProfit = totalProfit(month.sold);
+      const recent = [...state.items].sort((a,b) => new Date(b.status === 'sold' ? (b.sold_at || b.created_at) : b.created_at) - new Date(a.status === 'sold' ? (a.sold_at || a.created_at) : a.created_at)).slice(0,4);
       const best = [...sold].sort((a,b) => profit(b) - profit(a))[0];
 
       document.getElementById('page-home').innerHTML = `
-        <div class="hero">
-          <div>
-            <div class="hero-label">Profit total obținut</div>
-            <div class="hero-value">${money(totalProfit())}</div>
-            <div class="hero-meta">
-              <span class="hero-chip">${sold.length} produse vândute</span>
-              <span class="hero-chip">${published.length} anunțuri active</span>
+        <section class="cinema-hero">
+          <div class="cinema-copy">
+            <span class="cinema-kicker">Vinted Sales Studio</span>
+            <h2>Banii tăi, clar și simplu.</h2>
+            <p>Adaugi produsul, îl marchezi ca vândut, iar aplicația îți calculează automat încasările, investiția și profitul.</p>
+
+            <button class="hero-profit-card" type="button" data-home-action="monthly-profit">
+              <small>Profit luna aceasta</small>
+              <strong>${money(monthProfit)}</strong>
+              <span>Apasă aici pentru statisticile lunii</span>
+            </button>
+
+            <div class="hero-buttons">
+              <button class="primary-btn" type="button" data-open-add>+ Adaugă un produs</button>
+              <button class="ghost-light" type="button" data-home-action="revenue">Vezi de unde vin banii</button>
             </div>
           </div>
-          <div class="hero-side">
-            <div class="hero-side-card"><span>Profit săptămâna aceasta</span><strong>${money(currentProfit)}</strong></div>
-            <div class="hero-side-card"><span>Încasări totale</span><strong>${money(totalRevenue())}</strong></div>
-          </div>
-        </div>
 
-        <div class="metric-grid">
-          <article class="metric-card"><div class="metric-top"><span>PUBLICATE</span><div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l3 4v14H3V7z"/><path d="M3 7h18"/></svg></div></div><strong>${published.length}</strong></article>
-          <article class="metric-card"><div class="metric-top"><span>VÂNDUTE</span><div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg></div></div><strong>${sold.length}</strong></article>
-          <article class="metric-card"><div class="metric-top"><span>INVESTIȚIE RECUPERATĂ</span><div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div></div><strong>${money(totalInvestment())}</strong></article>
-          <article class="metric-card"><div class="metric-top"><span>PRODUSE ÎN TOP</span><div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6-5.4-2.9-5.4 2.9 1-6-4.4-4.3 6.1-.9z"/></svg></div></div><strong>${getTop().length}</strong></article>
-        </div>
+          <div class="cinema-summary">
+            <div class="spotlight-card" role="button" tabindex="0" data-home-action="revenue">
+              <span>Încasări totale</span><strong>${money(totalRevenue())}</strong><em>Vezi produsele vândute</em>
+            </div>
+            <div class="spotlight-card" role="button" tabindex="0" data-go="statistics" data-scroll-target="current-week">
+              <span>Profit săptămâna aceasta</span><strong>${money(currentProfit)}</strong><em>Vezi săptămâna curentă</em>
+            </div>
+            <div class="spotlight-card" role="button" tabindex="0" data-go="top">
+              <span>Cel mai profitabil produs</span><strong>${best ? escapeHtml(best.title) : 'Nu există încă'}</strong><em>${best ? `Profit ${money(profit(best))}` : 'Marchează prima vânzare'}</em>
+            </div>
+          </div>
+        </section>
+
+        <section class="simple-flow" aria-label="Cum funcționează aplicația">
+          <div class="flow-step"><div class="flow-number">1</div><div><strong>Adaugi produsul</strong><span>Scrii cât ai plătit și prețul pus pe Vinted.</span></div></div>
+          <div class="flow-step"><div class="flow-number">2</div><div><strong>Apeși „Marchează vândut”</strong><span>Introduci suma reală primită de la cumpărător.</span></div></div>
+          <div class="flow-step"><div class="flow-number">3</div><div><strong>Profitul se calculează singur</strong><span>Cu cât l-ai vândut? minus preț cumpărat.</span></div></div>
+        </section>
+
+        <section class="quick-grid" aria-label="Acces rapid">
+          <article class="quick-card clickable-card" role="button" tabindex="0" data-go="published">
+            <div class="quick-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l3 4v14H3V7z"/><path d="M3 7h18M9 11h6"/></svg></div>
+            <strong class="quick-value">${published.length}</strong><span class="quick-title">Produse publicate</span><span class="quick-description">Anunțurile care sunt acum active.</span>
+          </article>
+          <article class="quick-card dark clickable-card" role="button" tabindex="0" data-go="sold">
+            <div class="quick-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V5H4v14h8"/><path d="m15 18 2 2 4-5M8 9h8M8 13h4"/></svg></div>
+            <strong class="quick-value">${sold.length}</strong><span class="quick-title">Produse vândute</span><span class="quick-description">Vezi prețul cumpărat, vândut și profitul.</span>
+          </article>
+          <article class="quick-card gold clickable-card" role="button" tabindex="0" data-go="sold" data-toast="Aici vezi banii investiți în produsele deja vândute.">
+            <div class="quick-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div>
+            <strong class="quick-value">${money(totalInvestment())}</strong><span class="quick-title">Bani investiți recuperați</span><span class="quick-description">Costul produselor pe care le-ai vândut.</span>
+          </article>
+          <article class="quick-card plum clickable-card" role="button" tabindex="0" data-go="top">
+            <div class="quick-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6-5.4-2.9-5.4 2.9 1-6-4.4-4.3 6.1-.9z"/></svg></div>
+            <strong class="quick-value">${getTop().length}</strong><span class="quick-title">Produse TOP</span><span class="quick-description">Produsele importante, păstrate separat.</span>
+          </article>
+        </section>
 
         <div class="dashboard-grid">
           <section class="panel">
-            <div class="panel-head"><div><h2>Ultimele produse</h2><p>Cele mai recente anunțuri și vânzări</p></div><button class="mini-btn" data-go="published">Vezi toate</button></div>
+            <div class="panel-head"><div><span class="section-kicker">Activitate recentă</span><h2>Ultimele produse</h2><p>Apasă pe produs și îl deschidem direct în locul potrivit.</p></div></div>
             <div class="list-stack">
-              ${recent.length ? recent.map(item => `<div class="mini-product">${imageMarkup(item,'thumb')}<div style="min-width:0;"><strong>${escapeHtml(item.title)}</strong><span>${item.status === 'sold' ? `Vândut · ${fmtDate(item.sold_at || item.created_at)}` : `Publicat · ${fmtDate(item.created_at)}`}</span></div><div class="price">${item.status === 'sold' ? money(item.sold_price) : money(item.asking_price)}</div></div>`).join('') : emptyState('Niciun produs', 'Apasă pe + pentru primul anunț.')}
+              ${recent.length ? recent.map(item => {
+                const targetPage = item.status === 'published' ? 'published' : (item.is_top ? 'top' : 'sold');
+                return `<div class="mini-product" role="button" tabindex="0" data-open-item="${item.id}" data-target-page="${targetPage}">${imageMarkup(item,'thumb')}<div style="min-width:0;"><strong>${escapeHtml(item.title)}</strong><span>${item.status === 'sold' ? `Vândut · ${fmtDate(item.sold_at || item.created_at)}` : `Publicat · ${fmtDate(item.created_at)}`}</span></div><div style="display:flex;align-items:center;gap:7px;"><div class="price">${item.status === 'sold' ? money(item.sold_price) : money(item.asking_price)}</div><svg class="icon-sm card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div></div>`;
+              }).join('') : emptyState('Nu ai produse încă', 'Apasă pe „Adaugă produs” pentru a începe.')}
             </div>
           </section>
 
-          <section class="panel">
-            <div class="panel-head"><div><h2>Săptămâna curentă</h2><p>${fmtDate(current.start)} – ${fmtDate(current.end)}</p></div></div>
+          <section class="panel clickable-card" role="button" tabindex="0" data-go="statistics" data-scroll-target="current-week">
+            <div class="panel-head"><div><span class="section-kicker">Rezumat automat</span><h2>Săptămâna aceasta</h2><p>${fmtDate(current.start)} – ${fmtDate(current.end)}</p></div><svg class="icon-sm card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>
             <div class="week-summary">
-              <div class="week-row"><span>Produse vândute</span><strong>${current.items.length}</strong></div>
-              <div class="week-row"><span>Încasări</span><strong>${money(totalRevenue(current.items))}</strong></div>
-              <div class="week-row"><span>Cost produse</span><strong>${money(totalInvestment(current.items))}</strong></div>
-              <div class="week-row"><span>Profit</span><strong class="${currentProfit >= 0 ? 'positive' : 'negative'}">${money(currentProfit)}</strong></div>
-              <div class="week-row"><span>Cel mai profitabil produs</span><strong>${best ? escapeHtml(best.title) : '—'}</strong></div>
+              <div class="week-row"><span>Produse adăugate</span><strong>${current.publishedItems.length}</strong></div>
+              <div class="week-row"><span>Produse vândute</span><strong>${current.soldItems.length}</strong></div>
+              <div class="week-row"><span>Bani încasați</span><strong>${money(totalRevenue(current.soldItems))}</strong></div>
+              <div class="week-row"><span>Profit obținut</span><strong class="${currentProfit >= 0 ? 'positive' : 'negative'}">${money(currentProfit)}</strong></div>
             </div>
           </section>
         </div>`;
@@ -992,13 +1651,21 @@
 
     function renderListPage(page, items, mode, emptyTitle, emptyText) {
       const list = filtered(items);
+      const copy = {
+        published: ['Produse active', 'Aici sunt toate anunțurile aflate acum la vânzare. Când vinzi unul, apasă „Marchează vândut”.'],
+        sold: ['Istoricul vânzărilor', 'Pentru fiecare produs vezi cât ai plătit, cât ai primit și profitul obținut.'],
+        top: ['Produsele tale TOP', 'Păstrează aici produsele care au mers cel mai bine sau pe care vrei să le urmărești separat.']
+      }[page];
       document.getElementById(`page-${page}`).innerHTML = `
+        <section class="section-intro">
+          <div><span class="section-kicker">Organizare simplă</span><h2>${copy[0]}</h2><p>${copy[1]}</p></div>
+          <div class="count-bubble">${items.length}</div>
+        </section>
         <div class="section-tools">
           <div class="input-wrap search-box">
             <span class="field-icon"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span>
-            <input data-search type="search" placeholder="Caută un produs..." value="${escapeHtml(state.search)}" />
+            <input data-search type="search" placeholder="Caută după numele produsului..." value="${escapeHtml(state.search)}" />
           </div>
-          <div class="sync-pill"><span>${items.length} produse</span></div>
         </div>
         ${list.length ? `<div class="products-grid">${list.map(item => productCard(item, mode)).join('')}</div>` : emptyState(emptyTitle, emptyText)}
       `;
@@ -1006,35 +1673,80 @@
 
     function renderStatistics() {
       const groups = weeklyGroups();
-      const maxProfit = Math.max(1, ...groups.map(g => Math.abs(totalProfit(g.items))));
+      const month = currentMonthData();
+      const monthRevenue = totalRevenue(month.sold);
+      const monthInvestment = totalInvestment(month.sold);
+      const monthProfit = totalProfit(month.sold);
+      const maxProfit = Math.max(1, ...groups.map(g => Math.abs(totalProfit(g.soldItems))));
       document.getElementById('page-statistics').innerHTML = `
-        <div class="stats-head-card">
+        <div id="monthly-summary" class="monthly-overview">
+          <section class="month-main-card">
+            <div class="month-label">Profit luna aceasta · ${new Intl.DateTimeFormat('ro-RO', { month:'long', year:'numeric' }).format(new Date())}</div>
+            <div class="month-profit ${monthProfit < 0 ? 'negative' : ''}">${money(monthProfit)}</div>
+            <div class="month-grid">
+              <div class="month-mini"><span>Publicate</span><strong>${month.published.length}</strong></div>
+              <div class="month-mini"><span>Vândute</span><strong>${month.sold.length}</strong></div>
+              <div class="month-mini"><span>Încasări</span><strong>${money(monthRevenue)}</strong></div>
+            </div>
+          </section>
+          <section class="month-side-card">
+            <div class="month-label">Rezumat financiar lunar</div>
+            <div class="week-summary" style="margin-top:13px;">
+              <div class="week-row"><span>Investiție recuperată</span><strong>${money(monthInvestment)}</strong></div>
+              <div class="week-row"><span>Profit mediu/produs</span><strong>${money(month.sold.length ? monthProfit / month.sold.length : 0)}</strong></div>
+              <div class="week-row"><span>Actualizat</span><strong>${fmtDateTime(new Date())}</strong></div>
+            </div>
+          </section>
+        </div>
+
+        <div id="current-week" class="stats-head-card">
           <h2>Statistici săptămânale automate</h2>
-          <p>Fiecare produs este inclus în săptămâna în care a fost marcat ca vândut. Actualizat la ${fmtDateTime(new Date())}.</p>
+          <p>Include anunțurile publicate și produsele vândute, cu data și ora fiecărei activități.</p>
         </div>
         <div class="weekly-list">
           ${groups.map((group, index) => {
-            const revenue = totalRevenue(group.items);
-            const investment = totalInvestment(group.items);
-            const pr = totalProfit(group.items);
-            const avg = group.items.length ? pr / group.items.length : 0;
+            const revenue = totalRevenue(group.soldItems);
+            const investment = totalInvestment(group.soldItems);
+            const pr = totalProfit(group.soldItems);
+            const avg = group.soldItems.length ? pr / group.soldItems.length : 0;
             const width = Math.max(2, Math.round(Math.abs(pr) / maxProfit * 100));
             return `<article class="weekly-card">
               <div class="weekly-title">
                 <div><h3>${index === 0 ? 'Săptămâna curentă' : `Săptămâna ${fmtDate(group.start)} – ${fmtDate(group.end)}`}</h3><p>${fmtDate(group.start)} – ${fmtDate(group.end)} · calculat ${fmtDateTime(new Date())}</p></div>
-                <span class="badge ${pr >= 0 ? 'sold' : ''}">${group.items.length} vândute</span>
+                <span class="badge ${group.soldItems.length ? 'sold' : ''}">${group.publishedItems.length} publicate · ${group.soldItems.length} vândute</span>
               </div>
               <div class="weekly-stats">
-                <div class="weekly-stat"><span>Produse</span><strong>${group.items.length}</strong></div>
+                <div class="weekly-stat"><span>Publicate</span><strong>${group.publishedItems.length}</strong></div>
+                <div class="weekly-stat"><span>Vândute</span><strong>${group.soldItems.length}</strong></div>
                 <div class="weekly-stat"><span>Încasări</span><strong>${money(revenue)}</strong></div>
                 <div class="weekly-stat"><span>Cost</span><strong>${money(investment)}</strong></div>
                 <div class="weekly-stat"><span>Profit</span><strong class="${pr >= 0 ? 'positive' : 'negative'}">${money(pr)}</strong></div>
                 <div class="weekly-stat"><span>Profit mediu</span><strong>${money(avg)}</strong></div>
               </div>
               <div class="profit-bar"><span style="width:${width}%"></span></div>
+              ${group.activities.length ? `<div class="weekly-products">${group.activities.slice(0,8).map(activity => {
+                const item = activity.item;
+                const targetPage = item.status === 'published' ? 'published' : (item.is_top ? 'top' : 'sold');
+                return `<div class="weekly-product-row" data-open-item="${item.id}" data-target-page="${targetPage}"><div><strong>${escapeHtml(item.title)}</strong><span>${activity.type === 'sold' ? 'Vândut' : 'Publicat'} · ${fmtDateTime(activity.date)}</span></div><em>${activity.type === 'sold' ? money(item.sold_price) : money(item.asking_price)}</em></div>`;
+              }).join('')}</div>` : ''}
             </article>`;
           }).join('')}
         </div>`;
+    }
+
+    function openRevenueModal() {
+      const items = [...getSold()].sort((a,b) => new Date(b.sold_at || b.created_at) - new Date(a.sold_at || a.created_at));
+      document.getElementById('modalRoot').innerHTML = `
+        <div class="modal-backdrop" data-close-modal>
+          <section class="modal" onclick="event.stopPropagation()">
+            <div class="modal-head"><div><h2>De unde provin încasările</h2><p style="margin:5px 0 0;color:var(--muted);font-size:11px;">Fiecare produs vândut, cu suma și data vânzării.</p></div><button type="button" class="close-btn" data-close-modal aria-label="Închide"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+            <div class="breakdown-list">
+              ${items.length ? items.map(item => `<div class="breakdown-row" data-open-item="${item.id}" data-target-page="${item.is_top ? 'top' : 'sold'}">${imageMarkup(item,'thumb')}<div><strong>${escapeHtml(item.title)}</strong><span>Vândut ${fmtDateTime(item.sold_at || item.created_at)} · profit ${money(profit(item))}</span></div><span class="breakdown-price">${money(item.sold_price)}</span></div>`).join('') : emptyState('Nicio încasare', 'Produsele vândute vor apărea aici.')}
+            </div>
+            <div class="modal-total"><span>Încasări totale</span><strong>${money(totalRevenue(items))}</strong></div>
+          </section>
+        </div>`;
+      bindDynamicEvents();
     }
 
     function renderSettings() {
@@ -1060,9 +1772,10 @@
 
           <section class="setting-card">
             <h3>Supabase</h3>
-            <p>${state.demo ? 'Aplicația este în modul local. Completează URL-ul și cheia anon în cod pentru sincronizare.' : 'Conectarea la Supabase este activă și datele sunt protejate prin cont.'}</p>
+            <p>${state.demo ? 'Aplicația este în modul local. Conectarea nu este activă. Verifică setările proiectului Supabase.' : 'Conectarea la Supabase este activă și datele sunt protejate prin cont.'}</p>
             <div class="setting-line"><span>Status</span><strong class="${state.demo ? '' : 'positive'}">${state.demo ? 'Neconfigurat' : 'Conectat'}</strong></div>
             <div class="setting-line"><span>Tabel</span><strong>vinted_items</strong></div>
+            <div class="setting-line"><span>Versiune</span><strong>3.0 · Hollywood Edition</strong></div>
           </section>
 
           <section class="setting-card">
@@ -1080,22 +1793,75 @@
       renderHome();
       renderListPage('published', getPublished(), 'published', 'Nu ai anunțuri publicate', 'Apasă pe + și adaugă primul produs.');
       renderListPage('sold', getSold(), 'sold', 'Nu ai produse vândute', 'Când marchezi un anunț ca vândut, apare aici.');
-      renderListPage('top', getTop(), 'top', 'Nu ai produse în TOP', 'Din pagina Vândute, apasă butonul „În TOP”.');
+      renderListPage('top', getTop(), 'top', 'Nu ai produse în TOP', 'Din pagina Vândute, apasă „Adaugă în TOP”.');
       renderStatistics();
       renderSettings();
       bindDynamicEvents();
     }
 
-    function setPage(page) {
+    function setPage(page, options = {}) {
+      const { record = true, focusId = null, scrollTarget = null } = options;
+      if (!pageInfo[page]) page = 'home';
+      const changed = state.page !== page;
       state.page = page;
       state.search = '';
+      state.focusItemId = focusId;
+
+      if (record && changed) {
+        if (state.pageHistory[state.pageHistory.length - 1] !== page) state.pageHistory.push(page);
+        if (state.pageHistory.length > 25) state.pageHistory.shift();
+      }
+
       document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
       document.getElementById(`page-${page}`).classList.add('active');
       document.querySelectorAll('.nav-item[data-page]').forEach(btn => btn.classList.toggle('active', btn.dataset.page === page));
       document.getElementById('pageTitle').textContent = pageInfo[page][0];
       document.getElementById('pageSubtitle').textContent = pageInfo[page][1];
       closeDrawer();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      requestAnimationFrame(() => {
+        if (focusId) {
+          renderAll();
+          document.getElementById(`page-${page}`).classList.add('active');
+          document.querySelectorAll('.page').forEach(el => { if (el.id !== `page-${page}`) el.classList.remove('active'); });
+          const target = document.getElementById(`item-${focusId}`);
+          target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => { state.focusItemId = null; target?.classList.remove('focused-item'); }, 1900);
+        } else if (scrollTarget) {
+          document.getElementById(scrollTarget)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+      });
+    }
+
+    function navigateBack() {
+      if (document.getElementById('modalRoot').innerHTML.trim()) return closeModal();
+      if (document.getElementById('sidebar').classList.contains('open')) return closeDrawer();
+      if (state.pageHistory.length > 1) {
+        state.pageHistory.pop();
+        const previous = state.pageHistory[state.pageHistory.length - 1] || 'home';
+        setPage(previous, { record: false });
+      } else if (state.page !== 'home') {
+        setPage('home', { record: false });
+      }
+    }
+
+    function installSwipeBack() {
+      document.addEventListener('touchstart', event => {
+        if (event.touches.length !== 1 || event.touches[0].clientX > 34) return;
+        state.swipeStart = { x: event.touches[0].clientX, y: event.touches[0].clientY, time: Date.now() };
+      }, { passive: true });
+
+      document.addEventListener('touchend', event => {
+        if (!state.swipeStart || !event.changedTouches.length) return;
+        const end = event.changedTouches[0];
+        const dx = end.clientX - state.swipeStart.x;
+        const dy = Math.abs(end.clientY - state.swipeStart.y);
+        const elapsed = Date.now() - state.swipeStart.time;
+        state.swipeStart = null;
+        if (dx >= 72 && dy <= 65 && elapsed <= 700) navigateBack();
+      }, { passive: true });
     }
 
     function openDrawer() {
@@ -1112,7 +1878,7 @@
       document.getElementById('modalRoot').innerHTML = `
         <div class="modal-backdrop" data-close-modal>
           <form id="addForm" class="modal" onclick="event.stopPropagation()">
-            <div class="modal-head"><h2>Publică un anunț</h2><button type="button" class="close-btn" data-close-modal aria-label="Închide"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+            <div class="modal-head"><h2>Adaugă un produs</h2><button type="button" class="close-btn" data-close-modal aria-label="Închide"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
             <div class="form-grid">
               <div class="field full-span">
                 <label>Fotografie</label>
@@ -1121,11 +1887,11 @@
                   <div class="image-picker-content">${ICON_EMPTY}<div style="font-weight:750;margin-top:8px;">Alege fotografia produsului</div><div style="font-size:11px;margin-top:4px;">Imaginea este comprimată automat</div></div>
                 </label>
               </div>
-              <div class="field full-span"><label for="itemTitle">Numele produsului</label><input id="itemTitle" maxlength="80" placeholder="Ex: Brățară placată cu aur" required /></div>
-              <div class="field"><label for="purchasePrice">Preț cumpărat</label><input id="purchasePrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
-              <div class="field"><label for="askingPrice">Preț publicat</label><input id="askingPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
+              <div class="field full-span"><label for="itemTitle">Ce produs vinzi?</label><input id="itemTitle" maxlength="80" placeholder="Ex: Brățară placată cu aur" required /></div>
+              <div class="field"><label for="purchasePrice">Cât ai plătit?</label><input id="purchasePrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
+              <div class="field"><label for="askingPrice">Prețul pus pe Vinted</label><input id="askingPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
             </div>
-            <div class="modal-actions"><button type="button" class="ghost-btn" data-close-modal>Anulează</button><button class="primary-btn" type="submit">Publică anunțul</button></div>
+            <div class="modal-actions"><button type="button" class="ghost-btn" data-close-modal>Anulează</button><button class="primary-btn" type="submit">Salvează la Publicate</button></div>
           </form>
         </div>`;
       bindModalClose();
@@ -1140,15 +1906,15 @@
       document.getElementById('modalRoot').innerHTML = `
         <div class="modal-backdrop" data-close-modal>
           <form id="sellForm" class="modal" onclick="event.stopPropagation()">
-            <div class="modal-head"><h2>Marchează ca vândut</h2><button type="button" class="close-btn" data-close-modal><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+            <div class="modal-head"><h2>Produs vândut</h2><button type="button" class="close-btn" data-close-modal><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
             <p style="margin:-7px 0 18px;color:var(--muted);font-size:13px;">${escapeHtml(item.title)}</p>
             <div class="form-grid">
-              <div class="field"><label>Preț cumpărat</label><input value="${Number(item.purchase_price).toFixed(2)}" disabled /></div>
-              <div class="field"><label for="soldPrice">Preț vândut</label><input id="soldPrice" type="number" min="0" step="0.01" inputmode="decimal" value="${Number(item.asking_price).toFixed(2)}" required /></div>
+              <div class="field"><label>Cât ai plătit?</label><input value="${Number(item.purchase_price).toFixed(2)}" disabled /></div>
+              <div class="field"><label for="soldPrice">Cu cât l-ai vândut?</label><input id="soldPrice" type="number" min="0" step="0.01" inputmode="decimal" value="${Number(item.asking_price).toFixed(2)}" required /></div>
               <div class="field full-span"><label for="soldAt">Data și ora vânzării</label><input id="soldAt" type="datetime-local" value="${localNow}" required /></div>
             </div>
             <div id="liveProfit" style="margin-top:2px;padding:13px;border-radius:13px;background:var(--success-soft);color:var(--success);font-weight:800;">Profit: ${money(Number(item.asking_price)-Number(item.purchase_price))}</div>
-            <div class="modal-actions"><button type="button" class="ghost-btn" data-close-modal>Anulează</button><button class="primary-btn" type="submit">Confirmă vânzarea</button></div>
+            <div class="modal-actions"><button type="button" class="ghost-btn" data-close-modal>Anulează</button><button class="primary-btn" type="submit">Salvează vânzarea</button></div>
           </form>
         </div>`;
       bindModalClose();
@@ -1246,22 +2012,53 @@
     }
 
     function bindDynamicEvents() {
-      document.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset.id)));
-      document.querySelectorAll('[data-go]').forEach(btn => btn.addEventListener('click', () => setPage(btn.dataset.go)));
-      document.querySelectorAll('[data-search]').forEach(input => input.addEventListener('input', event => {
+      document.querySelectorAll('[data-action]').forEach(btn => btn.onclick = () => handleAction(btn.dataset.action, btn.dataset.id));
+      document.querySelectorAll('[data-go]').forEach(btn => {
+        const activate = () => {
+          setPage(btn.dataset.go, { scrollTarget: btn.dataset.scrollTarget || null });
+          if (btn.dataset.toast) toast(btn.dataset.toast);
+        };
+        btn.onclick = activate;
+        btn.onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activate(); } };
+      });
+      document.querySelectorAll('[data-open-add]').forEach(btn => {
+        btn.onclick = openAddModal;
+      });
+      document.querySelectorAll('[data-home-action]').forEach(btn => {
+        const activate = () => {
+          if (btn.dataset.homeAction === 'monthly-profit') setPage('statistics', { scrollTarget: 'monthly-summary' });
+          if (btn.dataset.homeAction === 'revenue') openRevenueModal();
+        };
+        btn.onclick = activate;
+        btn.onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activate(); } };
+      });
+      document.querySelectorAll('[data-open-item]').forEach(el => {
+        const activate = () => {
+          const id = el.dataset.openItem;
+          const item = state.items.find(entry => entry.id === id);
+          if (!item) return;
+          closeModal();
+          const page = el.dataset.targetPage || (item.status === 'published' ? 'published' : (item.is_top ? 'top' : 'sold'));
+          setPage(page, { focusId: id });
+        };
+        el.onclick = activate;
+        el.onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activate(); } };
+      });
+      document.querySelectorAll('[data-search]').forEach(input => input.oninput = event => {
         state.search = event.target.value;
         if (state.page === 'published') renderListPage('published', getPublished(), 'published', 'Nu ai anunțuri publicate', 'Apasă pe + și adaugă primul produs.');
         if (state.page === 'sold') renderListPage('sold', getSold(), 'sold', 'Nu ai produse vândute', 'Când marchezi un anunț ca vândut, apare aici.');
-        if (state.page === 'top') renderListPage('top', getTop(), 'top', 'Nu ai produse în TOP', 'Din pagina Vândute, apasă butonul „În TOP”.');
+        if (state.page === 'top') renderListPage('top', getTop(), 'top', 'Nu ai produse în TOP', 'Din pagina Vândute, apasă „Adaugă în TOP”.');
         bindDynamicEvents();
         const active = document.querySelector(`#page-${state.page} [data-search]`);
         active?.focus();
         active?.setSelectionRange(active.value.length, active.value.length);
-      }));
+      });
 
-      document.getElementById('logoutBtn')?.addEventListener('click', logout);
-      document.getElementById('exportBtn')?.addEventListener('click', exportData);
-      document.getElementById('resetBtn')?.addEventListener('click', resetData);
+      document.querySelectorAll('[data-close-modal]').forEach(el => el.onclick = closeModal);
+      document.getElementById('logoutBtn')?.addEventListener('click', logout, { once: true });
+      document.getElementById('exportBtn')?.addEventListener('click', exportData, { once: true });
+      document.getElementById('resetBtn')?.addEventListener('click', resetData, { once: true });
     }
 
     function exportData() {
@@ -1314,9 +2111,9 @@
         return;
       }
 
-      let { data, error } = await db.auth.signInWithPassword({ email: FIXED_EMAIL, password: pin });
+      let { data, error } = await db.auth.signInWithPassword({ email: FIXED_EMAIL, password: supabasePasswordFromPin(pin) });
       if (error && /Invalid login credentials/i.test(error.message)) {
-        const signup = await db.auth.signUp({ email: FIXED_EMAIL, password: pin });
+        const signup = await db.auth.signUp({ email: FIXED_EMAIL, password: supabasePasswordFromPin(pin) });
         data = signup.data;
         error = signup.error;
       }
@@ -1354,7 +2151,8 @@
       if (!state.demo) { pill.classList.add('online'); text.textContent = 'Supabase conectat'; }
       else { pill.classList.remove('online'); text.textContent = 'Mod local'; }
       await loadItems();
-      setPage('home');
+      state.pageHistory = ['home'];
+      setPage('home', { record: false });
     }
 
     async function boot() {
@@ -1367,6 +2165,7 @@
       document.getElementById('menuBtn').addEventListener('click', openDrawer);
       document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
       document.querySelectorAll('.nav-item[data-page]').forEach(btn => btn.addEventListener('click', () => setPage(btn.dataset.page)));
+      installSwipeBack();
 
       if (state.demo) {
         if (localStorage.getItem(sessionKey()) === 'active') {
