@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b63f6" />
+  <title>Vinted Manager</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --blue: #0b63f6;
+      --blue-2: #2f80ff;
+      --blue-soft: #eaf2ff;
+      --blue-pale: #f4f8ff;
+      --navy: #0d2145;
+      --text: #17233c;
+      --muted: #71809f;
+      --line: #e3eaf7;
+      --white: #ffffff;
+      --success: #17a56b;
+      --success-soft: #eafaf3;
+      --danger: #e4495b;
+      --danger-soft: #fff0f2;
+      --warning: #f0a62b;
+      --warning-soft: #fff7e8;
+      --shadow: 0 16px 50px rgba(31, 83, 167, 0.12);
+      --shadow-sm: 0 8px 26px rgba(31, 83, 167, 0.09);
+      --radius: 22px;
+      --radius-sm: 15px;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: #eef5ff; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(73, 139, 255, .16), transparent 25%),
+        linear-gradient(145deg, #f8fbff 0%, #eef5ff 55%, #f8fbff 100%);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    img { display: block; max-width: 100%; }
+    .hidden { display: none !important; }
+
+    .icon { width: 21px; height: 21px; flex: 0 0 auto; }
+    .icon-sm { width: 17px; height: 17px; }
+
+    /* LOGIN */
+    .login-shell {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      width: min(430px, 100%);
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(255,255,255,.75);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-card::before {
+      content: "";
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      right: -90px;
+      top: -105px;
+      background: linear-gradient(145deg, rgba(11,99,246,.22), rgba(66,151,255,.05));
+    }
+
+    .brand-mark {
+      width: 58px;
+      height: 58px;
+      border-radius: 19px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(145deg, var(--blue), #56a1ff);
+      box-shadow: 0 12px 28px rgba(11,99,246,.27);
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-mark svg { width: 30px; height: 30px; }
+    .login-card h1 { margin: 0; font-size: 28px; letter-spacing: -.7px; }
+    .login-subtitle { color: var(--muted); margin: 8px 0 26px; line-height: 1.45; }
+
+    .field { margin-bottom: 15px; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 750;
+      color: #465575;
+      margin: 0 0 7px 4px;
+    }
+
+    .input-wrap { position: relative; }
+    .input-wrap .field-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8090af;
+      pointer-events: none;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      color: var(--text);
+      border-radius: 14px;
+      outline: none;
+      transition: .18s ease;
+    }
+    input, select { height: 49px; padding: 0 14px; }
+    .input-wrap input { padding-left: 43px; }
+    textarea { min-height: 90px; resize: vertical; padding: 13px 14px; }
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(11,99,246,.65);
+      box-shadow: 0 0 0 4px rgba(11,99,246,.09);
+      background: white;
+    }
+
+    .primary-btn, .secondary-btn, .danger-btn, .ghost-btn, .mini-btn {
+      border: 0;
+      border-radius: 14px;
+      font-weight: 750;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    }
+    .primary-btn:active, .secondary-btn:active, .danger-btn:active, .ghost-btn:active, .mini-btn:active { transform: scale(.98); }
+    .primary-btn {
+      min-height: 50px;
+      padding: 0 19px;
+      color: white;
+      background: linear-gradient(135deg, var(--blue), var(--blue-2));
+      box-shadow: 0 10px 24px rgba(11,99,246,.24);
+    }
+    .primary-btn.full { width: 100%; }
+    .secondary-btn { min-height: 44px; padding: 0 16px; color: var(--blue); background: var(--blue-soft); }
+    .danger-btn { min-height: 44px; padding: 0 16px; color: var(--danger); background: var(--danger-soft); }
+    .ghost-btn { min-height: 42px; padding: 0 13px; color: #4c5d7d; background: transparent; border: 1px solid var(--line); }
+    .mini-btn { min-height: 35px; padding: 0 12px; font-size: 12px; color: var(--blue); background: var(--blue-soft); }
+    .mini-btn.success { color: var(--success); background: var(--success-soft); }
+    .mini-btn.top { color: #9d6500; background: var(--warning-soft); }
+    .mini-btn.remove { color: var(--danger); background: var(--danger-soft); }
+    button:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
+
+    .login-note {
+      margin-top: 18px;
+      padding: 12px 13px;
+      border-radius: 13px;
+      background: var(--blue-pale);
+      color: #5a6e94;
+      font-size: 12px;
+      line-height: 1.45;
+      border: 1px solid #e4eeff;
+    }
+
+    .login-error { min-height: 20px; margin-top: 10px; color: var(--danger); font-size: 13px; text-align: center; }
+
+    /* APP LAYOUT */
+    .app-shell { min-height: 100vh; display: flex; }
+
+    .sidebar {
+      width: 270px;
+      padding: 22px 17px 18px;
+      background: rgba(255,255,255,.94);
+      border-right: 1px solid rgba(220,230,247,.9);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 30;
+      backdrop-filter: blur(18px);
+    }
+
+    .side-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 5px 8px 24px;
+    }
+    .side-brand .brand-mark { width: 44px; height: 44px; border-radius: 14px; margin: 0; }
+    .side-brand .brand-mark svg { width: 24px; height: 24px; }
+    .side-brand strong { display: block; font-size: 17px; }
+    .side-brand span { font-size: 11px; color: var(--muted); }
+
+    .nav-list { display: grid; gap: 6px; }
+    .nav-item {
+      border: 0;
+      width: 100%;
+      min-height: 48px;
+      padding: 0 13px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #52617f;
+      background: transparent;
+      border-radius: 14px;
+      font-weight: 700;
+      text-align: left;
+    }
+    .nav-item:hover { background: #f5f8fe; }
+    .nav-item.active {
+      color: var(--blue);
+      background: linear-gradient(90deg, #eaf2ff, #f4f8ff);
+      box-shadow: inset 3px 0 0 var(--blue);
+    }
+    .nav-spacer { flex: 1; }
+    .side-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 13px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fbfdff;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 900;
+    }
+    .side-user strong { display: block; font-size: 13px; }
+    .side-user span { display: block; color: var(--muted); font-size: 10px; max-width: 145px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .main {
+      width: calc(100% - 270px);
+      margin-left: 270px;
+      min-height: 100vh;
+      padding: 28px 32px 105px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 25px;
+    }
+    .topbar h1 { margin: 0; font-size: clamp(25px, 3vw, 34px); letter-spacing: -1px; }
+    .topbar p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .menu-btn { display: none; }
+
+    .sync-pill {
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid var(--line);
+      color: #5b6d8d;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warning); box-shadow: 0 0 0 4px rgba(240,166,43,.12); }
+    .sync-pill.online .sync-dot { background: var(--success); box-shadow: 0 0 0 4px rgba(23,165,107,.12); }
+
+    .page { display: none; animation: fadeIn .23s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+    .hero {
+      border-radius: 27px;
+      background:
+        radial-gradient(circle at 86% 20%, rgba(255,255,255,.28), transparent 28%),
+        linear-gradient(135deg, #0a5eea, #3488ff);
+      color: white;
+      min-height: 190px;
+      padding: 27px;
+      box-shadow: 0 18px 42px rgba(11,99,246,.22);
+      display: grid;
+      grid-template-columns: 1.4fr .8fr;
+      gap: 20px;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero::after {
+      content: "";
+      width: 270px;
+      height: 270px;
+      position: absolute;
+      right: -130px;
+      bottom: -170px;
+      border-radius: 50%;
+      border: 38px solid rgba(255,255,255,.09);
+    }
+    .hero-label { font-size: 13px; opacity: .83; font-weight: 700; }
+    .hero-value { font-size: clamp(36px, 6vw, 55px); font-weight: 900; letter-spacing: -2px; margin: 6px 0 12px; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hero-chip { padding: 7px 10px; border-radius: 10px; background: rgba(255,255,255,.15); font-size: 11px; font-weight: 750; backdrop-filter: blur(10px); }
+    .hero-side { z-index: 1; display: grid; gap: 10px; }
+    .hero-side-card { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.18); border-radius: 16px; padding: 13px 14px; backdrop-filter: blur(10px); }
+    .hero-side-card span { display: block; font-size: 11px; opacity: .78; }
+    .hero-side-card strong { display: block; font-size: 20px; margin-top: 3px; }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .metric-card, .panel, .product-card, .weekly-card {
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(225,234,247,.95);
+      box-shadow: var(--shadow-sm);
+    }
+    .metric-card { border-radius: 18px; padding: 17px; }
+    .metric-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .metric-icon { width: 39px; height: 39px; border-radius: 13px; display: grid; place-items: center; color: var(--blue); background: var(--blue-soft); }
+    .metric-card:nth-child(2) .metric-icon { color: var(--success); background: var(--success-soft); }
+    .metric-card:nth-child(3) .metric-icon { color: #835ac7; background: #f3edff; }
+    .metric-card:nth-child(4) .metric-icon { color: #ac6d00; background: var(--warning-soft); }
+    .metric-card span { color: var(--muted); font-size: 11px; font-weight: 700; }
+    .metric-card strong { display: block; font-size: 22px; margin-top: 12px; letter-spacing: -.4px; }
+
+    .dashboard-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px; }
+    .panel { border-radius: var(--radius); padding: 20px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 17px; }
+    .panel-head h2 { margin: 0; font-size: 17px; letter-spacing: -.3px; }
+    .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+
+    .list-stack { display: grid; gap: 10px; }
+    .mini-product {
+      display: grid;
+      grid-template-columns: 55px minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: center;
+      padding: 9px;
+      border-radius: 14px;
+      background: #f9fbff;
+      border: 1px solid #edf2fa;
+    }
+    .thumb { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #eaf2ff; }
+    .thumb-placeholder { display: grid; place-items: center; color: var(--blue); }
+    .mini-product strong { font-size: 13px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mini-product span { display: block; color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .price { font-weight: 850; font-size: 13px; white-space: nowrap; }
+
+    .week-summary { display: grid; gap: 13px; }
+    .week-row { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding-bottom: 11px; border-bottom: 1px solid var(--line); }
+    .week-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .week-row span { color: var(--muted); font-size: 12px; }
+    .week-row strong { font-size: 14px; }
+    .positive { color: var(--success) !important; }
+    .negative { color: var(--danger) !important; }
+
+    .section-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .search-box { max-width: 360px; flex: 1; }
+    .empty-state {
+      text-align: center;
+      padding: 48px 18px;
+      background: rgba(255,255,255,.85);
+      border: 1px dashed #cad9f2;
+      border-radius: 22px;
+      color: var(--muted);
+    }
+    .empty-icon { width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); margin: 0 auto 14px; }
+    .empty-state h3 { margin: 0 0 7px; color: var(--text); }
+    .empty-state p { margin: 0; font-size: 13px; }
+
+    .products-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .product-card { border-radius: 20px; overflow: hidden; min-width: 0; }
+    .product-image { aspect-ratio: 1.35 / 1; width: 100%; object-fit: cover; background: linear-gradient(145deg, #eaf2ff, #f8fbff); }
+    .product-image-placeholder { aspect-ratio: 1.35 / 1; display: grid; place-items: center; color: var(--blue); background: linear-gradient(145deg, #eaf2ff, #f8fbff); }
+    .product-body { padding: 15px; }
+    .product-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .product-title { margin: 0; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .badge { flex: 0 0 auto; padding: 5px 8px; font-size: 9px; font-weight: 850; text-transform: uppercase; letter-spacing: .4px; border-radius: 8px; color: var(--blue); background: var(--blue-soft); }
+    .badge.sold { color: var(--success); background: var(--success-soft); }
+    .badge.top { color: #9d6500; background: var(--warning-soft); }
+    .product-date { color: var(--muted); font-size: 10px; margin: 6px 0 13px; }
+    .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 13px; }
+    .price-box { padding: 9px 8px; border-radius: 11px; background: #f7faff; min-width: 0; }
+    .price-box span { display: block; color: var(--muted); font-size: 8px; text-transform: uppercase; letter-spacing: .3px; }
+    .price-box strong { display: block; margin-top: 3px; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .price-box.profit { background: var(--success-soft); }
+    .price-box.profit strong { color: var(--success); }
+    .product-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .top-card { position: relative; }
+    .top-card::before {
+      content: "TOP";
+      position: absolute;
+      top: 11px;
+      left: 11px;
+      z-index: 2;
+      color: #8a5900;
+      background: rgba(255,247,232,.94);
+      border: 1px solid rgba(240,166,43,.25);
+      padding: 6px 9px;
+      border-radius: 9px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .6px;
+      backdrop-filter: blur(8px);
+    }
+
+    .stats-head-card {
+      background: linear-gradient(135deg, #0b63f6, #4b96ff);
+      color: white;
+      border-radius: 22px;
+      padding: 21px;
+      margin-bottom: 17px;
+      box-shadow: 0 15px 35px rgba(11,99,246,.2);
+    }
+    .stats-head-card h2 { margin: 0; font-size: 18px; }
+    .stats-head-card p { margin: 7px 0 0; font-size: 12px; opacity: .8; }
+    .weekly-list { display: grid; gap: 14px; }
+    .weekly-card { border-radius: 20px; padding: 18px; }
+    .weekly-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .weekly-title h3 { margin: 0; font-size: 15px; }
+    .weekly-title p { margin: 5px 0 0; color: var(--muted); font-size: 10px; }
+    .weekly-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; }
+    .weekly-stat { border-radius: 12px; background: #f7faff; padding: 11px; }
+    .weekly-stat span { display: block; color: var(--muted); font-size: 9px; }
+    .weekly-stat strong { display: block; font-size: 14px; margin-top: 4px; }
+    .profit-bar { height: 8px; border-radius: 99px; background: #edf2fb; overflow: hidden; margin-top: 14px; }
+    .profit-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), #60a6ff); }
+
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
+    .setting-card { background: rgba(255,255,255,.9); border: 1px solid var(--line); border-radius: 20px; padding: 20px; box-shadow: var(--shadow-sm); }
+    .setting-card h3 { margin: 0 0 5px; font-size: 16px; }
+    .setting-card > p { margin: 0 0 17px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .setting-line { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .setting-line:last-child { border-bottom: 0; }
+    .setting-line span { color: var(--muted); font-size: 12px; }
+    .setting-line strong { font-size: 12px; text-align: right; word-break: break-word; }
+
+    .fab {
+      position: fixed;
+      right: 29px;
+      bottom: 28px;
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      border: 0;
+      color: white;
+      background: linear-gradient(145deg, var(--blue), #50a0ff);
+      box-shadow: 0 14px 35px rgba(11,99,246,.35);
+      display: grid;
+      place-items: center;
+      z-index: 25;
+    }
+    .fab svg { width: 27px; height: 27px; }
+    .fab:active { transform: scale(.96); }
+
+    /* MODALS */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(9,28,59,.52);
+      backdrop-filter: blur(8px);
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+    .modal {
+      width: min(560px, 100%);
+      max-height: min(90vh, 820px);
+      overflow-y: auto;
+      background: white;
+      border-radius: 25px;
+      box-shadow: 0 25px 80px rgba(0,25,75,.28);
+      padding: 23px;
+    }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 20px; }
+    .modal-head h2 { margin: 0; font-size: 20px; letter-spacing: -.4px; }
+    .close-btn { width: 39px; height: 39px; border-radius: 12px; border: 0; color: #657594; background: #f2f6fc; display: grid; place-items: center; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    .form-grid .full-span { grid-column: 1 / -1; }
+    .image-picker { border: 1px dashed #b9cae8; border-radius: 16px; background: #f8fbff; min-height: 135px; display: grid; place-items: center; overflow: hidden; position: relative; color: #6680aa; text-align: center; padding: 16px; }
+    .image-picker input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .image-picker img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .image-picker-content { position: relative; z-index: 1; }
+    .image-picker.has-image .image-picker-content { display: none; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
+
+    .toast-wrap { position: fixed; right: 22px; top: 20px; z-index: 120; display: grid; gap: 8px; }
+    .toast { min-width: min(340px, calc(100vw - 36px)); max-width: 420px; padding: 13px 15px; border-radius: 14px; background: #13284b; color: white; box-shadow: 0 14px 40px rgba(0,23,68,.28); font-size: 13px; animation: toastIn .25s ease; }
+    .toast.error { background: #b92d40; }
+    .toast.success { background: #137f55; }
+    @keyframes toastIn { from { transform: translateY(-8px); opacity: 0; } }
+
+    .drawer-overlay { display: none; }
+
+    @media (max-width: 1100px) {
+      .metric-grid { grid-template-columns: repeat(2, 1fr); }
+      .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .weekly-stats { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 850px) {
+      .sidebar { transform: translateX(-105%); transition: transform .23s ease; box-shadow: 18px 0 60px rgba(15,48,100,.2); }
+      .sidebar.open { transform: translateX(0); }
+      .drawer-overlay { display: block; position: fixed; inset: 0; z-index: 29; background: rgba(4,24,58,.4); backdrop-filter: blur(3px); }
+      .main { width: 100%; margin-left: 0; padding: 21px 18px 100px; }
+      .menu-btn { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 13px; border: 1px solid var(--line); background: rgba(255,255,255,.86); color: var(--blue); }
+      .topbar { align-items: flex-start; }
+      .top-actions { flex-direction: row-reverse; }
+      .dashboard-grid, .settings-grid { grid-template-columns: 1fr; }
+      .fab { right: 19px; bottom: 20px; }
+    }
+
+    @media (max-width: 600px) {
+      .login-shell { padding: 14px; }
+      .login-card { padding: 24px 19px; border-radius: 24px; }
+      .main { padding: 17px 13px 94px; }
+      .topbar { margin-bottom: 18px; }
+      .topbar h1 { font-size: 25px; }
+      .topbar p { max-width: 210px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .sync-pill span { display: none; }
+      .sync-pill { width: 38px; padding: 0; justify-content: center; }
+      .hero { grid-template-columns: 1fr; padding: 21px; min-height: 220px; }
+      .hero-value { font-size: 41px; }
+      .hero-side { grid-template-columns: 1fr 1fr; }
+      .hero-side-card { padding: 11px; }
+      .hero-side-card strong { font-size: 17px; }
+      .metric-grid { grid-template-columns: repeat(2, 1fr); gap: 9px; margin: 12px 0; }
+      .metric-card { padding: 13px; }
+      .metric-card strong { font-size: 18px; }
+      .products-grid { grid-template-columns: 1fr; gap: 12px; }
+      .product-card { display: grid; grid-template-columns: 112px minmax(0,1fr); }
+      .product-image, .product-image-placeholder { width: 112px; height: 100%; min-height: 178px; aspect-ratio: auto; }
+      .product-body { padding: 13px; }
+      .price-grid { gap: 5px; }
+      .price-box { padding: 8px 6px; }
+      .weekly-stats { grid-template-columns: repeat(2, 1fr); }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .full-span { grid-column: auto; }
+      .modal { padding: 19px 15px; border-radius: 21px; }
+      .modal-actions { flex-direction: column-reverse; }
+      .modal-actions button { width: 100%; }
+      .section-tools { align-items: stretch; flex-direction: column; }
+      .search-box { max-width: none; }
+      .fab { width: 58px; height: 58px; border-radius: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loginView" class="login-shell">
+    <section class="login-card">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5z"/><path d="m4 8.5 8 4.5 8-4.5M12 13v7"/></svg>
+      </div>
+      <h1>Vinted Manager</h1>
+      <p class="login-subtitle">Produse, vânzări și profit, toate într-un singur loc.</p>
+
+      <form id="loginForm">
+        <div class="field">
+          <label for="loginEmail">Cont</label>
+          <div class="input-wrap">
+            <span class="field-icon">
+              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m4 6 8 7 8-7"/></svg>
+            </span>
+            <input id="loginEmail" type="email" value="ionut7628c@gmail.com" readonly />
+          </div>
+        </div>
+        <div class="field">
+          <label for="loginPin">PIN</label>
+          <div class="input-wrap">
+            <span class="field-icon">
+              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            </span>
+            <input id="loginPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="current-password" placeholder="Introdu PIN-ul" required />
+          </div>
+        </div>
+        <button id="loginBtn" class="primary-btn full" type="submit">Conectare</button>
+        <div id="loginError" class="login-error"></div>
+      </form>
+      <div id="loginModeNote" class="login-note"></div>
+    </section>
+  </div>
+
+  <div id="appView" class="app-shell hidden">
+    <aside id="sidebar" class="sidebar">
+      <div class="side-brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5z"/><path d="m4 8.5 8 4.5 8-4.5M12 13v7"/></svg>
+        </div>
+        <div><strong>Vinted Manager</strong><span>Panoul tău de vânzări</span></div>
+      </div>
+
+      <nav class="nav-list" aria-label="Meniu principal">
+        <button class="nav-item active" data-page="home">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></svg>
+          Acasă
+        </button>
+        <button class="nav-item" data-page="published">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l3 4v14H3V7z"/><path d="M3 7h18M9 11h6"/></svg>
+          Publicate
+        </button>
+        <button class="nav-item" data-page="sold">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V5H4v14h8"/><path d="m15 18 2 2 4-5M8 9h8M8 13h4"/></svg>
+          Vândute
+        </button>
+        <button class="nav-item" data-page="top">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6-5.4-2.9-5.4 2.9 1-6-4.4-4.3 6.1-.9z"/></svg>
+          Cele mai vândute
+        </button>
+        <button class="nav-item" data-page="statistics">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          Statistici
+        </button>
+      </nav>
+
+      <div class="nav-spacer"></div>
+      <button class="nav-item" data-page="settings">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1A1.7 1.7 0 0 0 4.6 15 1.7 1.7 0 0 0 3.1 14H3v-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.5V3h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1v4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        Setări
+      </button>
+      <div class="side-user">
+        <div class="avatar">I</div>
+        <div><strong>Ionuț</strong><span>ionut7628c@gmail.com</span></div>
+      </div>
+    </aside>
+    <div id="drawerOverlay" class="drawer-overlay hidden"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:flex-start;gap:12px;min-width:0;">
+          <button id="menuBtn" class="menu-btn" aria-label="Deschide meniul">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
+          <div style="min-width:0;">
+            <h1 id="pageTitle">Acasă</h1>
+            <p id="pageSubtitle">Situația vânzărilor tale, actualizată automat.</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <div id="syncPill" class="sync-pill"><span class="sync-dot"></span><span id="syncText">Mod local</span></div>
+        </div>
+      </header>
+
+      <section id="page-home" class="page active"></section>
+      <section id="page-published" class="page"></section>
+      <section id="page-sold" class="page"></section>
+      <section id="page-top" class="page"></section>
+      <section id="page-statistics" class="page"></section>
+      <section id="page-settings" class="page"></section>
+    </main>
+
+    <button id="addFab" class="fab" aria-label="Adaugă un anunț">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+
+  <div id="modalRoot"></div>
+  <div id="toastWrap" class="toast-wrap"></div>
+
+  <script>
+    /* ===============================================================
+       CONFIGURARE SUPABASE
+       Înlocuiește valorile de mai jos cu Project URL și anon key.
+       Dacă rămân necompletate, aplicația funcționează în modul demo/local.
+       =============================================================== */
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const FIXED_EMAIL = 'ionut7628c@gmail.com';
+    const DEMO_PIN_HASH = 'b968e8bbbac5318680e60cee33b2cad83d75ea30b4005ac8903c7d3c66895146';
+
+    const ICON_PRODUCT = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l3 4v14H3V7z"/><path d="M3 7h18M9 11h6"/></svg>`;
+    const ICON_EMPTY = `<svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l3 4v14H3V7z"/><path d="M3 7h18M9 11h6"/></svg>`;
+
+    const CONFIGURED = SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('YOUR_') && !SUPABASE_ANON_KEY.includes('YOUR_');
+    const db = CONFIGURED ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    }) : null;
+
+    const state = {
+      user: null,
+      items: [],
+      page: 'home',
+      search: '',
+      editingImage: '',
+      demo: !CONFIGURED,
+      busy: false
+    };
+
+    const pageInfo = {
+      home: ['Acasă', 'Situația vânzărilor tale, actualizată automat.'],
+      published: ['Publicate', 'Toate anunțurile active.'],
+      sold: ['Vândute', 'Produsele vândute și profitul obținut.'],
+      top: ['Cele mai vândute', 'Produsele marcate de tine ca fiind în top.'],
+      statistics: ['Statistici', 'Rezultate calculate automat pentru fiecare săptămână.'],
+      settings: ['Setări', 'Cont, sincronizare și administrarea datelor.']
+    };
+
+    const money = value => `${Number(value || 0).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} lei`;
+    const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+    const uid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+    const nowIso = () => new Date().toISOString();
+
+    async function sha256(value) {
+      const bytes = new TextEncoder().encode(value);
+      const digest = await crypto.subtle.digest('SHA-256', bytes);
+      return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+    const fmtDateTime = value => new Intl.DateTimeFormat('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+    const fmtDate = value => new Intl.DateTimeFormat('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(value));
+
+    function toast(message, type = '') {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.textContent = message;
+      document.getElementById('toastWrap').appendChild(el);
+      setTimeout(() => el.remove(), 3200);
+    }
+
+    function setLoginMessage(message, error = false) {
+      const el = document.getElementById('loginError');
+      el.textContent = message || '';
+      el.style.color = error ? 'var(--danger)' : 'var(--success)';
+    }
+
+    function setBusy(busy) {
+      state.busy = busy;
+      document.querySelectorAll('button[type="submit"]').forEach(btn => btn.disabled = busy);
+      const loginBtn = document.getElementById('loginBtn');
+      if (loginBtn) loginBtn.textContent = busy ? 'Se conectează...' : 'Conectare';
+    }
+
+    function localKey() { return `vinted-manager-items-${FIXED_EMAIL}`; }
+    function sessionKey() { return `vinted-manager-session-${FIXED_EMAIL}`; }
+
+    function sampleItems() {
+      const d = new Date();
+      const ago = days => new Date(d.getTime() - days * 86400000).toISOString();
+      return [
+        { id: uid(), title: 'Brățară placată cu aur', purchase_price: 19.90, asking_price: 59.99, sold_price: null, status: 'published', image_url: '', is_top: false, created_at: ago(2), sold_at: null },
+        { id: uid(), title: 'Inel argint 925', purchase_price: 28, asking_price: 74.99, sold_price: 65, status: 'sold', image_url: '', is_top: true, created_at: ago(11), sold_at: ago(4) },
+        { id: uid(), title: 'Colier cu pandantiv', purchase_price: 22.50, asking_price: 69.99, sold_price: 62, status: 'sold', image_url: '', is_top: false, created_at: ago(18), sold_at: ago(9) },
+        { id: uid(), title: 'Cercei aurii eleganți', purchase_price: 14, asking_price: 49.99, sold_price: null, status: 'published', image_url: '', is_top: false, created_at: ago(1), sold_at: null }
+      ];
+    }
+
+    function loadLocalItems() {
+      try {
+        const raw = localStorage.getItem(localKey());
+        if (raw) return JSON.parse(raw);
+        const samples = sampleItems();
+        localStorage.setItem(localKey(), JSON.stringify(samples));
+        return samples;
+      } catch { return sampleItems(); }
+    }
+
+    function saveLocalItems() {
+      localStorage.setItem(localKey(), JSON.stringify(state.items));
+    }
+
+    async function loadItems() {
+      if (state.demo) {
+        state.items = loadLocalItems();
+        renderAll();
+        return;
+      }
+      const { data, error } = await db.from('vinted_items').select('*').order('created_at', { ascending: false });
+      if (error) {
+        toast(`Nu am putut încărca produsele: ${error.message}`, 'error');
+        return;
+      }
+      state.items = data || [];
+      renderAll();
+    }
+
+    async function createItem(payload) {
+      if (state.demo) {
+        state.items.unshift({ id: uid(), ...payload });
+        saveLocalItems();
+        renderAll();
+        return true;
+      }
+      const { data, error } = await db.from('vinted_items').insert({ ...payload, user_id: state.user.id }).select().single();
+      if (error) { toast(error.message, 'error'); return false; }
+      state.items.unshift(data);
+      renderAll();
+      return true;
+    }
+
+    async function updateItem(id, changes) {
+      if (state.demo) {
+        const index = state.items.findIndex(item => item.id === id);
+        if (index < 0) return false;
+        state.items[index] = { ...state.items[index], ...changes };
+        saveLocalItems();
+        renderAll();
+        return true;
+      }
+      const { data, error } = await db.from('vinted_items').update(changes).eq('id', id).select().single();
+      if (error) { toast(error.message, 'error'); return false; }
+      const index = state.items.findIndex(item => item.id === id);
+      if (index >= 0) state.items[index] = data;
+      renderAll();
+      return true;
+    }
+
+    async function deleteItem(id) {
+      if (state.demo) {
+        state.items = state.items.filter(item => item.id !== id);
+        saveLocalItems();
+        renderAll();
+        return true;
+      }
+      const { error } = await db.from('vinted_items').delete().eq('id', id);
+      if (error) { toast(error.message, 'error'); return false; }
+      state.items = state.items.filter(item => item.id !== id);
+      renderAll();
+      return true;
+    }
+
+    function getPublished() { return state.items.filter(item => item.status === 'published'); }
+    function getSold() { return state.items.filter(item => item.status === 'sold'); }
+    function getTop() { return state.items.filter(item => item.status === 'sold' && item.is_top); }
+    function profit(item) { return Number(item.sold_price || 0) - Number(item.purchase_price || 0); }
+    function totalProfit(items = getSold()) { return items.reduce((sum, item) => sum + profit(item), 0); }
+    function totalRevenue(items = getSold()) { return items.reduce((sum, item) => sum + Number(item.sold_price || 0), 0); }
+    function totalInvestment(items = getSold()) { return items.reduce((sum, item) => sum + Number(item.purchase_price || 0), 0); }
+
+    function startOfWeek(dateInput) {
+      const d = new Date(dateInput);
+      d.setHours(0,0,0,0);
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      return d;
+    }
+
+    function endOfWeek(start) {
+      const d = new Date(start);
+      d.setDate(d.getDate() + 6);
+      d.setHours(23,59,59,999);
+      return d;
+    }
+
+    function weeklyGroups() {
+      const map = new Map();
+      getSold().forEach(item => {
+        const date = new Date(item.sold_at || item.created_at);
+        const start = startOfWeek(date);
+        const key = start.toISOString().slice(0,10);
+        if (!map.has(key)) map.set(key, { start, end: endOfWeek(start), items: [] });
+        map.get(key).items.push(item);
+      });
+
+      const currentStart = startOfWeek(new Date());
+      const currentKey = currentStart.toISOString().slice(0,10);
+      if (!map.has(currentKey)) map.set(currentKey, { start: currentStart, end: endOfWeek(currentStart), items: [] });
+
+      return [...map.values()].sort((a,b) => b.start - a.start);
+    }
+
+    function imageMarkup(item, className = 'product-image') {
+      if (item.image_url) return `<img class="${className}" src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.title)}" />`;
+      if (className === 'thumb') return `<div class="thumb thumb-placeholder">${ICON_PRODUCT}</div>`;
+      return `<div class="product-image-placeholder">${ICON_EMPTY}</div>`;
+    }
+
+    function productCard(item, mode) {
+      const isSold = item.status === 'sold';
+      const p = profit(item);
+      const badge = item.is_top ? '<span class="badge top">TOP</span>' : `<span class="badge ${isSold ? 'sold' : ''}">${isSold ? 'Vândut' : 'Publicat'}</span>`;
+      const cardClass = item.is_top ? 'product-card top-card' : 'product-card';
+      const prices = isSold
+        ? `<div class="price-grid">
+            <div class="price-box"><span>Cumpărat</span><strong>${money(item.purchase_price)}</strong></div>
+            <div class="price-box"><span>Vândut</span><strong>${money(item.sold_price)}</strong></div>
+            <div class="price-box profit"><span>Profit</span><strong class="${p < 0 ? 'negative' : ''}">${money(p)}</strong></div>
+          </div>`
+        : `<div class="price-grid" style="grid-template-columns:1fr 1fr;">
+            <div class="price-box"><span>Cumpărat</span><strong>${money(item.purchase_price)}</strong></div>
+            <div class="price-box"><span>Publicat</span><strong>${money(item.asking_price)}</strong></div>
+          </div>`;
+
+      let actions = '';
+      if (mode === 'published') {
+        actions = `<button class="mini-btn success" data-action="sell" data-id="${item.id}">Vândut</button>
+                   <button class="mini-btn remove" data-action="delete" data-id="${item.id}">Șterge</button>`;
+      } else if (mode === 'sold') {
+        actions = `<button class="mini-btn ${item.is_top ? 'remove' : 'top'}" data-action="toggle-top" data-id="${item.id}">${item.is_top ? 'Scoate din TOP' : 'În TOP'}</button>
+                   <button class="mini-btn remove" data-action="delete" data-id="${item.id}">Șterge</button>`;
+      } else if (mode === 'top') {
+        actions = `<button class="mini-btn remove" data-action="toggle-top" data-id="${item.id}">Scoate din TOP</button>`;
+      }
+
+      return `<article class="${cardClass}">
+        ${imageMarkup(item)}
+        <div class="product-body">
+          <div class="product-title-row"><h3 class="product-title">${escapeHtml(item.title)}</h3>${badge}</div>
+          <div class="product-date">${isSold ? `Vândut: ${fmtDateTime(item.sold_at || item.created_at)}` : `Publicat: ${fmtDateTime(item.created_at)}`}</div>
+          ${prices}
+          <div class="product-actions">${actions}</div>
+        </div>
+      </article>`;
+    }
+
+    function emptyState(title, text) {
+      return `<div class="empty-state"><div class="empty-icon">${ICON_EMPTY}</div><h3>${title}</h3><p>${text}</p></div>`;
+    }
+
+    function filtered(items) {
+      const q = state.search.trim().toLowerCase();
+      return q ? items.filter(item => item.title.toLowerCase().includes(q)) : items;
+    }
+
+    function renderHome() {
+      const published = getPublished();
+      const sold = getSold();
+      const groups = weeklyGroups();
+      const current = groups.find(g => g.start.getTime() === startOfWeek(new Date()).getTime()) || groups[0];
+      const currentProfit = totalProfit(current.items);
+      const recent = [...state.items].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,4);
+      const best = [...sold].sort((a,b) => profit(b) - profit(a))[0];
+
+      document.getElementById('page-home').innerHTML = `
+        <div class="hero">
+          <div>
+            <div class="hero-label">Profit total obținut</div>
+            <div class="hero-value">${money(totalProfit())}</div>
+            <div class="hero-meta">
+              <span class="hero-chip">${sold.length} produse vândute</span>
+              <span class="hero-chip">${published.length} anunțuri active</span>
+            </div>
+          </div>
+          <div class="hero-side">
+            <div class="hero-side-card"><span>Profit săptămâna aceasta</span><strong>${money(currentProfit)}</strong></div>
+            <div class="hero-side-card"><span>Încasări totale</span><strong>${money(totalRevenue())}</strong></div>
+          </div>
+        </div>
+
+        <div class="metric-grid">
+          <article class="metric-card"><div class="metric-top"><span>PUBLICATE</span><div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l3 4v14H3V7z"/><path d="M3 7h18"/></svg></div></div><strong>${published.length}</strong></article>
+          <article class="metric-card"><div class="metric-top"><span>VÂNDUTE</span><div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg></div></div><strong>${sold.length}</strong></article>
+          <article class="metric-card"><div class="metric-top"><span>INVESTIȚIE RECUPERATĂ</span><div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div></div><strong>${money(totalInvestment())}</strong></article>
+          <article class="metric-card"><div class="metric-top"><span>PRODUSE ÎN TOP</span><div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6-5.4-2.9-5.4 2.9 1-6-4.4-4.3 6.1-.9z"/></svg></div></div><strong>${getTop().length}</strong></article>
+        </div>
+
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-head"><div><h2>Ultimele produse</h2><p>Cele mai recente anunțuri și vânzări</p></div><button class="mini-btn" data-go="published">Vezi toate</button></div>
+            <div class="list-stack">
+              ${recent.length ? recent.map(item => `<div class="mini-product">${imageMarkup(item,'thumb')}<div style="min-width:0;"><strong>${escapeHtml(item.title)}</strong><span>${item.status === 'sold' ? `Vândut · ${fmtDate(item.sold_at || item.created_at)}` : `Publicat · ${fmtDate(item.created_at)}`}</span></div><div class="price">${item.status === 'sold' ? money(item.sold_price) : money(item.asking_price)}</div></div>`).join('') : emptyState('Niciun produs', 'Apasă pe + pentru primul anunț.')}
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head"><div><h2>Săptămâna curentă</h2><p>${fmtDate(current.start)} – ${fmtDate(current.end)}</p></div></div>
+            <div class="week-summary">
+              <div class="week-row"><span>Produse vândute</span><strong>${current.items.length}</strong></div>
+              <div class="week-row"><span>Încasări</span><strong>${money(totalRevenue(current.items))}</strong></div>
+              <div class="week-row"><span>Cost produse</span><strong>${money(totalInvestment(current.items))}</strong></div>
+              <div class="week-row"><span>Profit</span><strong class="${currentProfit >= 0 ? 'positive' : 'negative'}">${money(currentProfit)}</strong></div>
+              <div class="week-row"><span>Cel mai profitabil produs</span><strong>${best ? escapeHtml(best.title) : '—'}</strong></div>
+            </div>
+          </section>
+        </div>`;
+    }
+
+    function renderListPage(page, items, mode, emptyTitle, emptyText) {
+      const list = filtered(items);
+      document.getElementById(`page-${page}`).innerHTML = `
+        <div class="section-tools">
+          <div class="input-wrap search-box">
+            <span class="field-icon"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span>
+            <input data-search type="search" placeholder="Caută un produs..." value="${escapeHtml(state.search)}" />
+          </div>
+          <div class="sync-pill"><span>${items.length} produse</span></div>
+        </div>
+        ${list.length ? `<div class="products-grid">${list.map(item => productCard(item, mode)).join('')}</div>` : emptyState(emptyTitle, emptyText)}
+      `;
+    }
+
+    function renderStatistics() {
+      const groups = weeklyGroups();
+      const maxProfit = Math.max(1, ...groups.map(g => Math.abs(totalProfit(g.items))));
+      document.getElementById('page-statistics').innerHTML = `
+        <div class="stats-head-card">
+          <h2>Statistici săptămânale automate</h2>
+          <p>Fiecare produs este inclus în săptămâna în care a fost marcat ca vândut. Actualizat la ${fmtDateTime(new Date())}.</p>
+        </div>
+        <div class="weekly-list">
+          ${groups.map((group, index) => {
+            const revenue = totalRevenue(group.items);
+            const investment = totalInvestment(group.items);
+            const pr = totalProfit(group.items);
+            const avg = group.items.length ? pr / group.items.length : 0;
+            const width = Math.max(2, Math.round(Math.abs(pr) / maxProfit * 100));
+            return `<article class="weekly-card">
+              <div class="weekly-title">
+                <div><h3>${index === 0 ? 'Săptămâna curentă' : `Săptămâna ${fmtDate(group.start)} – ${fmtDate(group.end)}`}</h3><p>${fmtDate(group.start)} – ${fmtDate(group.end)} · calculat ${fmtDateTime(new Date())}</p></div>
+                <span class="badge ${pr >= 0 ? 'sold' : ''}">${group.items.length} vândute</span>
+              </div>
+              <div class="weekly-stats">
+                <div class="weekly-stat"><span>Produse</span><strong>${group.items.length}</strong></div>
+                <div class="weekly-stat"><span>Încasări</span><strong>${money(revenue)}</strong></div>
+                <div class="weekly-stat"><span>Cost</span><strong>${money(investment)}</strong></div>
+                <div class="weekly-stat"><span>Profit</span><strong class="${pr >= 0 ? 'positive' : 'negative'}">${money(pr)}</strong></div>
+                <div class="weekly-stat"><span>Profit mediu</span><strong>${money(avg)}</strong></div>
+              </div>
+              <div class="profit-bar"><span style="width:${width}%"></span></div>
+            </article>`;
+          }).join('')}
+        </div>`;
+    }
+
+    function renderSettings() {
+      document.getElementById('page-settings').innerHTML = `
+        <div class="settings-grid">
+          <section class="setting-card">
+            <h3>Cont</h3>
+            <p>Informațiile contului folosit în aplicație.</p>
+            <div class="setting-line"><span>Nume</span><strong>Ionuț</strong></div>
+            <div class="setting-line"><span>Email</span><strong>${FIXED_EMAIL}</strong></div>
+            <div class="setting-line"><span>Stocare</span><strong>${state.demo ? 'Locală / Demo' : 'Supabase'}</strong></div>
+            <div style="margin-top:17px;"><button id="logoutBtn" class="ghost-btn">Deconectare</button></div>
+          </section>
+
+          <section class="setting-card">
+            <h3>Date</h3>
+            <p>Exportă o copie sau șterge toate produsele.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:9px;">
+              <button id="exportBtn" class="secondary-btn">Exportă JSON</button>
+              <button id="resetBtn" class="danger-btn">Șterge toate</button>
+            </div>
+          </section>
+
+          <section class="setting-card">
+            <h3>Supabase</h3>
+            <p>${state.demo ? 'Aplicația este în modul local. Completează URL-ul și cheia anon în cod pentru sincronizare.' : 'Conectarea la Supabase este activă și datele sunt protejate prin cont.'}</p>
+            <div class="setting-line"><span>Status</span><strong class="${state.demo ? '' : 'positive'}">${state.demo ? 'Neconfigurat' : 'Conectat'}</strong></div>
+            <div class="setting-line"><span>Tabel</span><strong>vinted_items</strong></div>
+          </section>
+
+          <section class="setting-card">
+            <h3>Rezumat</h3>
+            <p>Totalurile calculate din toate produsele tale.</p>
+            <div class="setting-line"><span>Publicate</span><strong>${getPublished().length}</strong></div>
+            <div class="setting-line"><span>Vândute</span><strong>${getSold().length}</strong></div>
+            <div class="setting-line"><span>Încasări</span><strong>${money(totalRevenue())}</strong></div>
+            <div class="setting-line"><span>Profit</span><strong class="positive">${money(totalProfit())}</strong></div>
+          </section>
+        </div>`;
+    }
+
+    function renderAll() {
+      renderHome();
+      renderListPage('published', getPublished(), 'published', 'Nu ai anunțuri publicate', 'Apasă pe + și adaugă primul produs.');
+      renderListPage('sold', getSold(), 'sold', 'Nu ai produse vândute', 'Când marchezi un anunț ca vândut, apare aici.');
+      renderListPage('top', getTop(), 'top', 'Nu ai produse în TOP', 'Din pagina Vândute, apasă butonul „În TOP”.');
+      renderStatistics();
+      renderSettings();
+      bindDynamicEvents();
+    }
+
+    function setPage(page) {
+      state.page = page;
+      state.search = '';
+      document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+      document.getElementById(`page-${page}`).classList.add('active');
+      document.querySelectorAll('.nav-item[data-page]').forEach(btn => btn.classList.toggle('active', btn.dataset.page === page));
+      document.getElementById('pageTitle').textContent = pageInfo[page][0];
+      document.getElementById('pageSubtitle').textContent = pageInfo[page][1];
+      closeDrawer();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openDrawer() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('drawerOverlay').classList.remove('hidden');
+    }
+    function closeDrawer() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('drawerOverlay').classList.add('hidden');
+    }
+
+    function openAddModal() {
+      state.editingImage = '';
+      document.getElementById('modalRoot').innerHTML = `
+        <div class="modal-backdrop" data-close-modal>
+          <form id="addForm" class="modal" onclick="event.stopPropagation()">
+            <div class="modal-head"><h2>Publică un anunț</h2><button type="button" class="close-btn" data-close-modal aria-label="Închide"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+            <div class="form-grid">
+              <div class="field full-span">
+                <label>Fotografie</label>
+                <label id="imagePicker" class="image-picker">
+                  <input id="imageInput" type="file" accept="image/*" />
+                  <div class="image-picker-content">${ICON_EMPTY}<div style="font-weight:750;margin-top:8px;">Alege fotografia produsului</div><div style="font-size:11px;margin-top:4px;">Imaginea este comprimată automat</div></div>
+                </label>
+              </div>
+              <div class="field full-span"><label for="itemTitle">Numele produsului</label><input id="itemTitle" maxlength="80" placeholder="Ex: Brățară placată cu aur" required /></div>
+              <div class="field"><label for="purchasePrice">Preț cumpărat</label><input id="purchasePrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
+              <div class="field"><label for="askingPrice">Preț publicat</label><input id="askingPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
+            </div>
+            <div class="modal-actions"><button type="button" class="ghost-btn" data-close-modal>Anulează</button><button class="primary-btn" type="submit">Publică anunțul</button></div>
+          </form>
+        </div>`;
+      bindModalClose();
+      document.getElementById('imageInput').addEventListener('change', handleImage);
+      document.getElementById('addForm').addEventListener('submit', submitAdd);
+    }
+
+    function openSellModal(id) {
+      const item = state.items.find(x => x.id === id);
+      if (!item) return;
+      const localNow = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,16);
+      document.getElementById('modalRoot').innerHTML = `
+        <div class="modal-backdrop" data-close-modal>
+          <form id="sellForm" class="modal" onclick="event.stopPropagation()">
+            <div class="modal-head"><h2>Marchează ca vândut</h2><button type="button" class="close-btn" data-close-modal><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+            <p style="margin:-7px 0 18px;color:var(--muted);font-size:13px;">${escapeHtml(item.title)}</p>
+            <div class="form-grid">
+              <div class="field"><label>Preț cumpărat</label><input value="${Number(item.purchase_price).toFixed(2)}" disabled /></div>
+              <div class="field"><label for="soldPrice">Preț vândut</label><input id="soldPrice" type="number" min="0" step="0.01" inputmode="decimal" value="${Number(item.asking_price).toFixed(2)}" required /></div>
+              <div class="field full-span"><label for="soldAt">Data și ora vânzării</label><input id="soldAt" type="datetime-local" value="${localNow}" required /></div>
+            </div>
+            <div id="liveProfit" style="margin-top:2px;padding:13px;border-radius:13px;background:var(--success-soft);color:var(--success);font-weight:800;">Profit: ${money(Number(item.asking_price)-Number(item.purchase_price))}</div>
+            <div class="modal-actions"><button type="button" class="ghost-btn" data-close-modal>Anulează</button><button class="primary-btn" type="submit">Confirmă vânzarea</button></div>
+          </form>
+        </div>`;
+      bindModalClose();
+      const soldInput = document.getElementById('soldPrice');
+      soldInput.addEventListener('input', () => document.getElementById('liveProfit').textContent = `Profit: ${money(Number(soldInput.value || 0) - Number(item.purchase_price || 0))}`);
+      document.getElementById('sellForm').addEventListener('submit', async event => {
+        event.preventDefault();
+        const soldPrice = Number(soldInput.value);
+        const soldAt = new Date(document.getElementById('soldAt').value).toISOString();
+        const ok = await updateItem(id, { status: 'sold', sold_price: soldPrice, sold_at: soldAt });
+        if (ok) { closeModal(); setPage('sold'); toast('Produsul a fost mutat la Vândute.', 'success'); }
+      });
+    }
+
+    function closeModal() { document.getElementById('modalRoot').innerHTML = ''; }
+    function bindModalClose() { document.querySelectorAll('[data-close-modal]').forEach(el => el.addEventListener('click', closeModal)); }
+
+    async function handleImage(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) return toast('Alege o imagine validă.', 'error');
+      try {
+        const dataUrl = await compressImage(file, 1000, .76);
+        state.editingImage = dataUrl;
+        const picker = document.getElementById('imagePicker');
+        picker.classList.add('has-image');
+        picker.querySelector('img')?.remove();
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.alt = 'Previzualizare';
+        picker.appendChild(img);
+      } catch { toast('Imaginea nu a putut fi procesată.', 'error'); }
+    }
+
+    function compressImage(file, maxSize, quality) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = reject;
+          img.onload = () => {
+            const ratio = Math.min(1, maxSize / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(img.width * ratio));
+            canvas.height = Math.max(1, Math.round(img.height * ratio));
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function submitAdd(event) {
+      event.preventDefault();
+      if (state.busy) return;
+      const title = document.getElementById('itemTitle').value.trim();
+      const purchase = Number(document.getElementById('purchasePrice').value);
+      const asking = Number(document.getElementById('askingPrice').value);
+      if (!title || Number.isNaN(purchase) || Number.isNaN(asking)) return;
+      setBusy(true);
+      const ok = await createItem({
+        title,
+        purchase_price: purchase,
+        asking_price: asking,
+        sold_price: null,
+        status: 'published',
+        image_url: state.editingImage || '',
+        is_top: false,
+        created_at: nowIso(),
+        sold_at: null
+      });
+      setBusy(false);
+      if (ok) { closeModal(); setPage('published'); toast('Anunțul a fost publicat.', 'success'); }
+    }
+
+    async function handleAction(action, id) {
+      if (action === 'sell') return openSellModal(id);
+      if (action === 'toggle-top') {
+        const item = state.items.find(x => x.id === id);
+        if (!item) return;
+        const ok = await updateItem(id, { is_top: !item.is_top });
+        if (ok) toast(item.is_top ? 'Produs scos din TOP.' : 'Produs adăugat în TOP.', 'success');
+      }
+      if (action === 'delete') {
+        const item = state.items.find(x => x.id === id);
+        if (!item) return;
+        if (!confirm(`Ștergi produsul „${item.title}”?`)) return;
+        const ok = await deleteItem(id);
+        if (ok) toast('Produs șters.', 'success');
+      }
+    }
+
+    function bindDynamicEvents() {
+      document.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset.id)));
+      document.querySelectorAll('[data-go]').forEach(btn => btn.addEventListener('click', () => setPage(btn.dataset.go)));
+      document.querySelectorAll('[data-search]').forEach(input => input.addEventListener('input', event => {
+        state.search = event.target.value;
+        if (state.page === 'published') renderListPage('published', getPublished(), 'published', 'Nu ai anunțuri publicate', 'Apasă pe + și adaugă primul produs.');
+        if (state.page === 'sold') renderListPage('sold', getSold(), 'sold', 'Nu ai produse vândute', 'Când marchezi un anunț ca vândut, apare aici.');
+        if (state.page === 'top') renderListPage('top', getTop(), 'top', 'Nu ai produse în TOP', 'Din pagina Vândute, apasă butonul „În TOP”.');
+        bindDynamicEvents();
+        const active = document.querySelector(`#page-${state.page} [data-search]`);
+        active?.focus();
+        active?.setSelectionRange(active.value.length, active.value.length);
+      }));
+
+      document.getElementById('logoutBtn')?.addEventListener('click', logout);
+      document.getElementById('exportBtn')?.addEventListener('click', exportData);
+      document.getElementById('resetBtn')?.addEventListener('click', resetData);
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify({ exported_at: nowIso(), items: state.items }, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `vinted-manager-${new Date().toISOString().slice(0,10)}.json`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    async function resetData() {
+      if (!confirm('Sigur ștergi toate produsele și statisticile?')) return;
+      if (state.demo) {
+        state.items = [];
+        saveLocalItems();
+        renderAll();
+        toast('Toate datele au fost șterse.', 'success');
+        return;
+      }
+      const ids = state.items.map(item => item.id);
+      if (!ids.length) return;
+      const { error } = await db.from('vinted_items').delete().in('id', ids);
+      if (error) return toast(error.message, 'error');
+      state.items = [];
+      renderAll();
+      toast('Toate datele au fost șterse.', 'success');
+    }
+
+    async function login(event) {
+      event.preventDefault();
+      const pin = document.getElementById('loginPin').value.trim();
+      if (!/^\d{4,8}$/.test(pin)) return setLoginMessage('PIN-ul trebuie să conțină între 4 și 8 cifre.', true);
+      setBusy(true);
+      setLoginMessage('');
+
+      if (state.demo) {
+        let validPin = false;
+        try { validPin = (await sha256(pin)) === DEMO_PIN_HASH; }
+        catch { validPin = pin === ['0','7','0','6'].join(''); }
+        if (!validPin) {
+          setLoginMessage('PIN incorect.', true);
+          setBusy(false);
+          return;
+        }
+        localStorage.setItem(sessionKey(), 'active');
+        state.user = { id: 'local-user', email: FIXED_EMAIL };
+        await enterApp();
+        setBusy(false);
+        return;
+      }
+
+      let { data, error } = await db.auth.signInWithPassword({ email: FIXED_EMAIL, password: pin });
+      if (error && /Invalid login credentials/i.test(error.message)) {
+        const signup = await db.auth.signUp({ email: FIXED_EMAIL, password: pin });
+        data = signup.data;
+        error = signup.error;
+      }
+      if (error) {
+        setLoginMessage(error.message, true);
+        setBusy(false);
+        return;
+      }
+      if (!data.session) {
+        setLoginMessage('Contul a fost creat, dar Supabase cere confirmarea emailului. Dezactivează opțiunea Confirm Email.', true);
+        setBusy(false);
+        return;
+      }
+      state.user = data.user;
+      await enterApp();
+      setBusy(false);
+    }
+
+    async function logout() {
+      if (!state.demo) await db.auth.signOut();
+      localStorage.removeItem(sessionKey());
+      state.user = null;
+      state.items = [];
+      document.getElementById('appView').classList.add('hidden');
+      document.getElementById('loginView').classList.remove('hidden');
+      document.getElementById('loginPin').value = '';
+      setLoginMessage('');
+    }
+
+    async function enterApp() {
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('appView').classList.remove('hidden');
+      const pill = document.getElementById('syncPill');
+      const text = document.getElementById('syncText');
+      if (!state.demo) { pill.classList.add('online'); text.textContent = 'Supabase conectat'; }
+      else { pill.classList.remove('online'); text.textContent = 'Mod local'; }
+      await loadItems();
+      setPage('home');
+    }
+
+    async function boot() {
+      document.getElementById('loginModeNote').innerHTML = state.demo
+        ? '<strong>Mod demonstrativ:</strong> aplicația funcționează acum cu date salvate pe dispozitiv. După completarea cheilor Supabase în cod, se sincronizează online.'
+        : '<strong>Supabase activ:</strong> introdu PIN-ul contului pentru conectare.';
+
+      document.getElementById('loginForm').addEventListener('submit', login);
+      document.getElementById('addFab').addEventListener('click', openAddModal);
+      document.getElementById('menuBtn').addEventListener('click', openDrawer);
+      document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+      document.querySelectorAll('.nav-item[data-page]').forEach(btn => btn.addEventListener('click', () => setPage(btn.dataset.page)));
+
+      if (state.demo) {
+        if (localStorage.getItem(sessionKey()) === 'active') {
+          state.user = { id: 'local-user', email: FIXED_EMAIL };
+          await enterApp();
+        }
+        return;
+      }
+
+      const { data } = await db.auth.getSession();
+      if (data.session) {
+        state.user = data.session.user;
+        await enterApp();
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>
